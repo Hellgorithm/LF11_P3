@@ -1,0 +1,59 @@
+{
+    "Users": [
+        {
+            "Name": "Alice",
+            "Surname": "Smith",
+            "LoginName": "asmith",
+            "GroupMemberships": ["Administrators", "Users"]
+        },
+        {
+            "Name": "Bob",
+            "Surname": "Johnson",
+            "LoginName": "bjohnson",
+            "GroupMemberships": ["Users"]
+        }
+    ],
+    "Groups": [
+        {
+            "Name": "Administrators",
+            "Permissions": {
+                "Share": {
+                    "Folder1": { "AccessLevel": "FullControl" },
+                    "Folder2": { "AccessLevel": "ReadOnly" }
+                },
+                "Ntfs": {
+                    "FolderA": { "AccessLevel": "FullControl" },
+                    "FolderB": { "AccessLevel": "ReadAndExecute" }
+                }
+            }
+        }
+    ],
+    "OUs": [
+        {
+            "Name": "MA_Auskunft",
+            "Users": ["asmith", "bjohnson"]
+        }
+    ],
+    "Folders": [
+        {
+            "Name": "Folder1",
+            "Path": "C:\\Folder1",
+            "Owner": "asmith",
+            "NTFSPermissions": {
+                "Administrators": "FullControl",
+                "Users": "ReadOnly"
+            },
+            "SharePermissions": {
+                "Administrators": "FullControl",
+                "Users": "ReadOnly"
+            }
+        }
+    ],
+    "DHCP": [
+        {
+            "Name": "DefaultScope",
+            "Subnet": "172.25.53.0"
+            "SubnetMask": "255.255.255.0"
+        }
+    ]
+}
