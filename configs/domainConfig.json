@@ -52,7 +52,7 @@
     "DHCP": [
         {
             "Name": "DefaultScope",
-            "Subnet": "172.25.53.0"
+            "Subnet": "172.25.53.0",
             "SubnetMask": "255.255.255.0"
         }
     ]
