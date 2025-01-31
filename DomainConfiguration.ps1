@@ -46,7 +46,7 @@ function Write-LogMessage($m, $e){
 }
 
 Switch (Test-Path $configFolderPath){
-    $false {throw "Config Path could not be found!"}
+    $false {Write-Output("Config Folder couldn't be found.")}
     $true {return}
 }
 
@@ -68,7 +68,7 @@ function readConfigs($selConfig){
         }
     }
     foreach ($user in $userConfig){
-        $allUsers += User::new($user.Name, $user.Surname, $user.LoginName, $user.Groups, $serverUNC)
+        $allUsers += User::new($user.Name, $user.Surname, $user.loginName, $user.Groups, $serverUNC)
     }
 }
 
@@ -80,6 +80,9 @@ function createDomainStructure(){
 
 # Handles Importing Users and Registering them in ADS
 function registerUsers(){
-    
+    foreach ($user in $allUsers){
+        # Write-LogMessage("Creating User $($user.loginName)", $null)
+        # New-ADUser -Name $user.name -Surname $user.surname -SamAccountName $user.loginName -AccountPassword (ConvertTo-SecureString "Password123" -AsPlainText -Force) -Enabled $true -Path "OU=Users,DC=domain,DC=local"
+    }
 
 }
