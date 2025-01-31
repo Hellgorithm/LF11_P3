@@ -159,11 +159,20 @@
             "DistinguishedName": "OU=MA_Auskunft,OU=Mitarbeiter,DC=gr3,DC=lab0304,DC=local"
         },
         {
-            "Name": "MA_Buchhaltung",
-            "DistinguishedName": "OU=MA_Buchhaltung,OU=Mitarbeiter,DC=gr3,DC=lab0304,DC=local"
+            "Name": "MA_Beratung",
+            "DistinguishedName": "OU=MA_Beratung,OU=Mitarbeiter,DC=gr3,DC=lab0304,DC=local"
         },
         {
-            
+            "Name": "MA_Technik",
+            "DistinguishedName": "OU=MA_Technik,OU=Mitarbeiter,DC=gr3,DC=lab0304,DC=local"
+        },
+        {
+            "Name": "MA_STB",
+            "DistinguishedName": "OU=MA_STB,OU=Mitarbeiter,DC=gr3,DC=lab0304,DC=local"
+        },
+        {
+            "Name": "MA_GL",
+            "DistinguishedName": "OU=MA_GL,OU=Mitarbeiter,DC=gr3,DC=lab0304,DC=local"
         }
     ],
     "Folders": [
@@ -176,14 +185,14 @@
                 "grp_STB": "ReadAndExecute",
                 "grp_Beratung": "ReadAndExecute",
                 "grp_Technik": "Modify",
-                "grp_GL": "ReadAndExecute"
+                "grp_GL": "Modify"
             },
             "SharePermissions": {
                 "grp_Auskunft": "Read",
                 "grp_STB": "Read",
                 "grp_Beratung": "Read",
                 "grp_Technik": "Change",
-                "grp_GL": "Read"
+                "grp_GL": "Change"
             }
         },
         {
@@ -210,18 +219,10 @@
             "Path": "C:\\Freigaben\\Transfer_Ausk",
             "Owner": "admsys",
             "NTFSPermissions": {
-                "grp_Auskunft": "Modify",
-                "grp_STB": "Modify",
-                "grp_Beratung": "Modify",
-                "grp_Technik": "Modify",
-                "grp_GL": "Modify"
+                "grp_Auskunft": "Modify"
             },
             "SharePermissions": {
-                "grp_Auskunft": "Change",
-                "grp_STB": "Change",
-                "grp_Beratung": "Change",
-                "grp_Technik": "Change",
-                "grp_GL": "Change"
+                "grp_Auskunft": "Change"
             }
         },
         {
@@ -230,20 +231,106 @@
             "Owner": "admsys",
             "NTFSPermissions": {
                 "grp_Auskunft": "ReadAndExecute",
-                "grp_STB": "ReadAndExecute",
-                "grp_Beratung": "ReadAndExecute",
-                "grp_Technik": "Modify",
-                "grp_GL": "ReadAndExecute"
+                "grp_GL": "Modify"
             },
             "SharePermissions": {
                 "grp_Auskunft": "Read",
-                "grp_STB": "Read",
-                "grp_Beratung": "Read",
-                "grp_Technik": "Change",
-                "grp_GL": "Read"
+                "grp_GL": "Change"
+            }         
+        },
+        {
+            "Name": "Transfer_STB",
+            "Path": "C:\\Freigaben\\Transfer_STB",
+            "Owner": "admsys",
+            "NTFSPermissions": {
+                "grp_STB": "Modify"
+            },
+            "SharePermissions": {
+                "grp_STB": "Change"
             }
-
-            
+        },
+        {
+            "Name": "Vorlagen_STB",
+            "Path": "C:\\Freigaben\\Vorlagen_STB",
+            "Owner": "admsys",
+            "NTFSPermissions": {
+                "grp_STB": "ReadAndExecute",
+                "grp_GL": "Modify"
+            },
+            "SharePermissions": {
+                "grp_STB": "Read",
+                "grp_GL": "Change"
+            }
+        },
+        {
+            "Name": "Transfer_Beratung",
+            "Path": "C:\\Freigaben\\Transfer_Beratung",
+            "Owner": "admsys",
+            "NTFSPermissions": {
+                "grp_Beratung": "Modify"
+            },
+            "SharePermissions": {
+                "grp_Beratung": "Change"
+            }
+        },
+        {
+            "Name": "Vorlagen_Beratung",
+            "Path": "C:\\Freigaben\\Vorlagen_Beratung",
+            "Owner": "admsys",
+            "NTFSPermissions": {
+                "grp_Beratung": "ReadAndExecute",
+                "grp_GL": "Modify"
+            },
+            "SharePermissions": {
+                "grp_Beratung": "Read",
+                "grp_GL": "Change"
+            }
+        },
+        {
+            "Name": "Transfer_Technik",
+            "Path": "C:\\Freigaben\\Transfer_Technik",
+            "Owner": "admsys",
+            "NTFSPermissions": {
+                "grp_Technik": "Modify"
+            },
+            "SharePermissions": {
+                "grp_Technik": "Change"
+            }
+        },
+        {
+            "Name": "Vorlagen_Technik",
+            "Path": "C:\\Freigaben\\Vorlagen_Technik",
+            "Owner": "admsys",
+            "NTFSPermissions": {
+                "grp_Technik": "ReadAndExecute",
+                "grp_GL": "Modify"
+            },
+            "SharePermissions": {
+                "grp_Technik": "Read",
+                "grp_GL": "Change"
+            }
+        },
+        {
+            "Name": "Transfer_GL",
+            "Path": "C:\\Freigaben\\Transfer_GL",
+            "Owner": "admsys",
+            "NTFSPermissions": {
+                "grp_GL": "FullAccess"
+            },
+            "SharePermissions": {
+                "grp_GL": "FullAccess"
+            }
+        },
+        {
+            "Name": "Vorlagen_GL",
+            "Path": "C:\\Freigaben\\Vorlagen_GL",
+            "Owner": "admsys",
+            "NTFSPermissions": {
+                "grp_GL": "FullAccess"
+            },
+            "SharePermissions": {
+                "grp_GL": "FullAccess"
+            }
         }
     ],
     "DHCP": [
