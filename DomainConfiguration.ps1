@@ -96,8 +96,14 @@ class networkShare {
     networkShare($name, $path, $ntfsPermissions, $sharePermissions){
         $this.name = $name
         $this.path = $path
-        $this.ntfsPermissions = $ntfsPermissions
-        $this.sharePermissions = $sharePermissions
+        $this.ntfsPermissions = @{}
+        $this.sharePermissions = @{}
+        foreach ($key in $ntfsPermissions.Keys){
+            $this.ntfsPermissions.Add($key, $ntfsPermissions.$key)
+        }
+        foreach ($key in $sharePermissions.Keys){
+            $this.sharePermissions.Add($key, $sharePermissions.$key)
+        }
     }
 }
 
@@ -112,7 +118,7 @@ function Prune-Log(){
 function Write-LogMessage($m, $e){
     try {
         $logMessage = "$(Get-Date -Format "dd.MM.yyyy HH:mm:ss")`r`n    - Message: $m"
-        if ($e -ne $null){
+        if ($null -ne $e){
             $logMessage += "`r`n    - Exception: $e`r`n"
         }
         Add-Content -Path $logFilePath -Value $logMessage
@@ -126,13 +132,6 @@ function Write-LogMessage($m, $e){
     }
 }
 
-#Checks if the Config Folder exists
-Switch (Test-Path $configFolderPath){
-    $false {Write-Output("Config Folder couldn't be found.")
-            Write-LogMessage("Config Folder couldn't be found on startup.", "Configs not found in directory $configFolderPath")
-            exit}
-    $true {return}
-}
 
 # Reads and Imports the Config Files used for Domain creation
 function readConfigs($selConfig){
@@ -157,7 +156,14 @@ function readConfigs($selConfig){
         }
     }
     foreach ($user in $userConfig){
-        $allUsers.Add([User]::new($user.Name, $user.Surname, $user.loginName, $user.Groups, $serverUNC))
+        if (($user.Groups.Count -gt 0) -and ($user.Groups.Count -le 1)){
+            $private:userOuPath = $ouConfig | Where-Object {$_.Name -eq $user.Groups[0]} | Select-Object -ExpandProperty DistinguishedName
+        }
+        else {
+            $private:ouChoice = Read-Host( "Multiple Groups detected. Enter the OU Name for User $($user.Name) $($user.Surname)`r`nGroup Memberships: $($user.Groups)`r`nDISCLAIMER: Only OUs defined in the Config File will be accepted.")
+            $private:userOuPath = $ouConfig | Where-Object {$_.Name -eq $private:ouChoice} | Select-Object -ExpandProperty DistinguishedName
+        }
+        $allUsers.Add([User]::new($user.Name, $user.Surname, $user.loginName, $user.Groups, $serverUNC, $private:userOuPath, $internetDomain))
     }
     foreach ($share in $shareConfig){
         $allShares.Add([networkShare]::new($share.Name, $share.Path, $share.ntfsPermissions, $share.SharePermissions))
@@ -220,15 +226,13 @@ function createNetworkShares(){
             $private:index = 0
             $private:rejoinedPathList = New-Object -TypeName System.Collections.Generic.List[string]
             $private:folderPathParts = $share.Path -split "\\"
-            foreach ($subFolder in $private:parentFolders){
-                $private:rejoinedPathList = $private:folderPathParts[$private:index] + "\" + $subFolder
+            foreach ($subFolder in $private:folderPathParts){
+                $private:rejoinedPathList.Add($private:folderPathParts[$private:index] + "\" + $subFolder)
                 $private:index++
                 if (!(Test-Path $subFolder)){
                     New-Item -Path $subFolder -ItemType Directory
                 }
             }
-            $private:parentPath = Split-Path($share.path) -Parent
-            New-Item -Path $share.path -ItemType Directory
             Write-Host("Share Folder $($share.name) created successfully.") -ForegroundColor Green
         }
         catch {
@@ -281,7 +285,7 @@ function configurePrinters() {
             
             # Add printer if it doesn't exist
             if (!(Get-Printer -Name $printer.Name -ErrorAction SilentlyContinue)) {
-                Add-Printer -Name $printer.Name -DriverName $printer.DriverName -PortName $printer.PortName -Shared:$printer.Shared -ShareName $printer.ShareName -Location $printer.Location -Comment $printer.Comment
+                Add-Printer -Name $printer.Name -DriverName $printer.DriverName -PortName $printer.PortName -Shared:$true -ShareName $printer.Name
             }
             
             # Configure print permissions
