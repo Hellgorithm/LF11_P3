@@ -2,6 +2,11 @@
 
 This repository contains scripts for automating the configuration and management of Microsoft Active Directory Domain Services (ADDS) environments.
 
+---
+**DISCLAIMER: NOTE THAT THIS IS CURRENTLY WORK IN PROGRESS, AND AS SUCH WILL LIKELY NOT WORK OR BREAK**
+
+---
+
 ## Main Features
 
 - Automated domain environment setup
@@ -67,5 +72,3 @@ The script generates logs at `DomainConfig.log` in the script directory, with au
 - HGR
 
 ---
-
-*Last Updated: 10.01.2025*
