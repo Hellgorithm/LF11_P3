@@ -369,8 +369,8 @@
             "ScopeEnd": "172.25.53.254",
             "SubnetMask": "255.255.255.0",
             "LeaseDuration": "5.00:00:00",
-            "DnsServer": "172.25.53.50",
-            "Gateway": "172.25.53.1"
+            "DnsServer": "172.25.53.1",
+            "Gateway": "172.25.53.254"
         }
     ],
     "Printers": [

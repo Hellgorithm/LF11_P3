@@ -320,7 +320,7 @@ function configureDHCP(){
     if (!(Get-WindowsFeature -Name DHCP | Where Installed)){
         Install-WindowsFeature -Name DHCP -IncludeManagementTools
     }
-    Add-DhcpServerInDC -DnsName "$env:COMPUTERNAME.$localDomain" -IpAddress ""
+    Add-DhcpServerInDC -DnsName "$env:COMPUTERNAME.$localDomain" -IpAddress $dhcpConfig.DnsServer
 
     # Set DHCP Scope
     Add-DhcpServerv4Scope -Name $dhcpConfig.Name -StartRange $dhcpConfig.ScopeStart -EndRange $dhcpConfig.ScopeEnd -SubnetMask $dhcpConfig.SubnetMask -LeaseDuration $dhcpConfig.LeaseDuration -State Active
