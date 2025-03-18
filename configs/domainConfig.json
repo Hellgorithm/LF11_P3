@@ -64,6 +64,7 @@
     "Groups": [
         {
             "Name": "grp_Auskunft",
+            "ouPath": "ou=Gruppen,dc=gr3,dc=lab0304,dc=local",
             "Permissions": {
                 "Share": {
                     "Vorlagen": { "AccessLevel": "Change" },
@@ -81,6 +82,7 @@
         },
         {
             "Name": "grp_STB",
+            "ouPath": "ou=Gruppen,dc=gr3,dc=lab0304,dc=local",
             "Permissions": {
                 "Share": {
                     "Vorlagen": { "AccessLevel": "Change" },
@@ -98,6 +100,7 @@
         },
         {
             "Name": "grp_Beratung",
+            "ouPath": "ou=Gruppen,dc=gr3,dc=lab0304,dc=local",
             "Permissions": {
                 "Share": {
                     "Vorlagen": { "AccessLevel": "Change" },
@@ -115,6 +118,7 @@
         },
         {
             "Name": "grp_Technik",
+            "ouPath": "ou=Gruppen,dc=gr3,dc=lab0304,dc=local",
             "Permissions": {
                 "Share": {
                     "Vorlagen": { "AccessLevel": "Change" },
@@ -132,6 +136,7 @@
         },
         {
             "Name": "grp_GL",
+            "ouPath": "ou=Gruppen,dc=gr3,dc=lab0304,dc=local",
             "Permissions": {
                 "Share": {
                     "Vorlagen": { "AccessLevel": "Change" },
@@ -151,28 +156,52 @@
     ],
     "OUs": [
         {
+            "Name": "Gruppen",
+            "DistinguishedName": "OU=Gruppen,DC=gr3,DC=lab0304,DC=local"
+        },
+        {
+            "Name": "Oeffentlich",
+            "DistinguishedName": "OU=Oeffentlich,DC=gr3,DC=lab0304,DC=local"
+        },
+        {
+            "Name": "Computers",
+            "DistinguishedName": "OU=Computers,OU=Oeffentlich,DC=gr3,DC=lab0304,DC=local"
+        },
+        {
+            "Name": "Users",
+            "DistinguishedName": "OU=Users,OU=Oeffentlich,DC=gr3,DC=lab0304,DC=local"
+        },
+        {
+            "Name": "Intern",
+            "DistinguishedName": "OU=Intern,DC=gr3,DC=lab0304,DC=local"
+        },
+        {
             "Name": "Mitarbeiter",
-            "DistinguishedName": "OU=Mitarbeiter,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=Mitarbeiter,OU=Intern,DC=gr3,DC=lab0304,DC=local"
+        },
+        {
+            "Name": "Computer",
+            "DistinguishedName": "OU=Computer,OU=Intern,DC=gr3,DC=lab0304,DC=local"
         },
         {
             "Name": "MA_Auskunft",
-            "DistinguishedName": "OU=MA_Auskunft,OU=Mitarbeiter,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=MA_Auskunft,OU=Mitarbeiter,OU=Intern,DC=gr3,DC=lab0304,DC=local"
         },
         {
             "Name": "MA_Beratung",
-            "DistinguishedName": "OU=MA_Beratung,OU=Mitarbeiter,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=MA_Beratung,OU=Mitarbeiter,OU=Intern,DC=gr3,DC=lab0304,DC=local"
         },
         {
             "Name": "MA_Technik",
-            "DistinguishedName": "OU=MA_Technik,OU=Mitarbeiter,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=MA_Technik,OU=Mitarbeiter,OU=Intern,DC=gr3,DC=lab0304,DC=local"
         },
         {
             "Name": "MA_STB",
-            "DistinguishedName": "OU=MA_STB,OU=Mitarbeiter,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=MA_STB,OU=Mitarbeiter,OU=Intern,DC=gr3,DC=lab0304,DC=local"
         },
         {
             "Name": "MA_GL",
-            "DistinguishedName": "OU=MA_GL,OU=Mitarbeiter,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=MA_GL,OU=Mitarbeiter,OU=Intern,DC=gr3,DC=lab0304,DC=local"
         }
     ],
     "Folders": [
@@ -336,8 +365,23 @@
     "DHCP": [
         {
             "Name": "DefaultScope",
-            "Subnet": "172.25.53.0",
-            "SubnetMask": "255.255.255.0"
+            "ScopeStart": "172.25.53.100",
+            "ScopeEnd": "172.25.53.254",
+            "SubnetMask": "255.255.255.0",
+            "LeaseDuration": "5.00:00:00",
+            "DnsServer": "172.25.53.50",
+            "Gateway": "172.25.53.1"
+        }
+    ],
+    "Printers": [
+        {
+            "Name": "HP_LaserJet_5",
+            "Driver": "HP LaserJet 5",
+            "PortName": "IP_172.25.53.10",
+            "PrintPermissions": {
+                "Allow": ["grp_Auskunft", "grp_STB", "grp_Beratung", "grp_Technik", "grp_GL"],
+                "Deny": []
+            }
         }
     ]
 }
