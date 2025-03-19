@@ -236,19 +236,19 @@ function registerUsers(){
 }
 
 function createNetworkShares(){
-
+    $private:rejoinedPathList = New-Object -TypeName System.Collections.Generic.List[string]
     foreach($share in $allShares){
         $private:index = 0
         # Traverse the share Folder path, creating the necessary folders
         try {
-            $private:rejoinedPathList = New-Object -TypeName System.Collections.Generic.List[string]
             $private:folderPathParts = $share.Path -split "\\"
             foreach ($subFolder in $folderPathParts){
                 $rejoinedPathList.Add($folderPathParts[$index] + "\\" + $subFolder)
-                $index++
-                if (!(Test-Path $subFolder)){
-                    New-Item -Path $subFolder -ItemType Directory
+                $private:rejoinedPath = [string]::Concat($rejoinedPathList)
+                if (!(Test-Path $rejoinedPath)){
+                    New-Item -LiteralPath $rejoinedPath -ItemType Directory
                 }
+                $index++
             }
             Write-Host("Share Folder $($share.name) created successfully.") -ForegroundColor Green
         }
