@@ -365,6 +365,7 @@
     "DHCP": [
         {
             "Name": "DefaultScope",
+            "ScopeID": "172.25.53.0",
             "ScopeStart": "172.25.53.100",
             "ScopeEnd": "172.25.53.254",
             "SubnetMask": "255.255.255.0",

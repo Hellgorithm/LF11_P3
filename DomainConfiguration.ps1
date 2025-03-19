@@ -215,7 +215,7 @@ function registerUsers(){
                         Write-Host("User $($user.loginName) added to Group $($groupPrefix + $group).") -ForegroundColor Green
                     }
                     else {
-                        Add-ADGroupMember -Identity "Domain Admins" -Members $user.loginName
+                        Add-ADGroupMember -Identity "Domänen-Admins" -Members $user.loginName
                         Write-Host("User $($user.loginName) added to Group Domain Admins.") -ForegroundColor Green
                     }
                 } 
@@ -225,7 +225,7 @@ function registerUsers(){
                 }
                 
             }
-            Add-ADGroupMember -Identity "Domain Users" -Members $user.loginName
+            Add-ADGroupMember -Identity "Domänen-Benutzer" -Members $user.loginName
             Write-Host("User $($user.loginName) added to Group Domain Users.") -ForegroundColor Green
         }
         catch {
@@ -238,15 +238,14 @@ function registerUsers(){
 function createNetworkShares(){
 
     foreach($share in $allShares){
-
+        $private:index = 0
         # Traverse the share Folder path, creating the necessary folders
         try {
-            $private:index = 0
             $private:rejoinedPathList = New-Object -TypeName System.Collections.Generic.List[string]
             $private:folderPathParts = $share.Path -split "\\"
-            foreach ($subFolder in $private:folderPathParts){
-                $private:rejoinedPathList.Add($private:folderPathParts[$private:index] + "\" + $subFolder)
-                $private:index++
+            foreach ($subFolder in $folderPathParts){
+                $rejoinedPathList.Add($folderPathParts[$index] + "\\" + $subFolder)
+                $index++
                 if (!(Test-Path $subFolder)){
                     New-Item -Path $subFolder -ItemType Directory
                 }
@@ -353,8 +352,8 @@ function configureDHCP(){
     Add-DhcpServerv4Scope -Name $dhcpConfig.Name -StartRange $dhcpConfig.ScopeStart -EndRange $dhcpConfig.ScopeEnd -SubnetMask $dhcpConfig.SubnetMask -LeaseDuration $dhcpConfig.LeaseDuration -State Active
 
     # Set DHCP Options
-    $private:scopeID = Get-DhcpServerv4Scope -ComputerName $env:COMPUTERNAME | Where-Object {$_.Name -eq $dhcpConfig.Name} | Select-Object -ExpandProperty ScopeId
-    Set-DhcpServerV4OptionValue -ScopeId $private:scopeID -DnsServer $dhcpConfig.DnsServer -Router $dhcpConfig.Gateway 
+    # $private:scopeID = Get-DhcpServerv4Scope -ComputerName $env:COMPUTERNAME | Where-Object {$_.Name -eq $dhcpConfig.Name} | Select-Object -ExpandProperty ScopeId
+    Set-DhcpServerV4OptionValue -ScopeId $dhcpConfig.ScopeID -DnsServer $dhcpConfig.DnsServer -Router $dhcpConfig.Gateway -DnsDomain $localDomain
 }
 
 #endregion Helper Functions
