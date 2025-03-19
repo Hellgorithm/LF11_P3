@@ -163,7 +163,7 @@ function readConfigs($selConfig){
         }
         else {
             $private:ouChoice = Read-Host("Multiple Groups detected. Enter the OU Name for User $($user.Name) $($user.Surname)`r`nGroup Memberships: $($user.GroupMemberships)`r`nDISCLAIMER: Only OUs defined in the Config File will be accepted.")
-            $private:userOuPath = $ouConfig | Where-Object {$_.Name -eq $private:ouChoice} | Select-Object -ExpandProperty DistinguishedName
+            $private:userOuPath = $ouConfig | Where-Object {$_.Name -eq ("MA-" + $ouChoice)} | Select-Object -ExpandProperty DistinguishedName
         }
         $allUsers.Add([User]::new($user.Name, $user.Surname, $user.loginName, $user.Groups, $serverUNC, $private:userOuPath, $internetDomain))
     }
@@ -189,7 +189,7 @@ function registerGroups(){
     foreach ($group in $groupConfig){
         Write-LogMessage("Creating Group $($group.name)", $null)
         try {
-            New-ADGroup -Name ($groupPrefix + $group.name) -Path $group.ouPath
+            New-ADGroup -Name ($groupPrefix + $group.name) -Path $group.ouPath -GroupScope DomainLocal -GroupCategory Security
             Write-Host("Group $($group.name) created successfully.") -ForegroundColor Green
         }
         catch {
