@@ -64,7 +64,7 @@
     "Groups": [
         {
             "Name": "Auskunft",
-            "ouPath": "ou=Gruppen,dc=gr3,dc=lab0304,dc=local",
+            "ouPath": "ou=Gruppen,dc=gr3,dc=laba304,dc=local",
             "Permissions": {
                 "Share": {
                     "Vorlagen": { "AccessLevel": "Change" },
@@ -82,7 +82,7 @@
         },
         {
             "Name": "STB",
-            "ouPath": "ou=Gruppen,dc=gr3,dc=lab0304,dc=local",
+            "ouPath": "ou=Gruppen,dc=gr3,dc=laba304,dc=local",
             "Permissions": {
                 "Share": {
                     "Vorlagen": { "AccessLevel": "Change" },
@@ -100,7 +100,7 @@
         },
         {
             "Name": "Beratung",
-            "ouPath": "ou=Gruppen,dc=gr3,dc=lab0304,dc=local",
+            "ouPath": "ou=Gruppen,dc=gr3,dc=laba304,dc=local",
             "Permissions": {
                 "Share": {
                     "Vorlagen": { "AccessLevel": "Change" },
@@ -118,7 +118,7 @@
         },
         {
             "Name": "Technik",
-            "ouPath": "ou=Gruppen,dc=gr3,dc=lab0304,dc=local",
+            "ouPath": "ou=Gruppen,dc=gr3,dc=laba304,dc=local",
             "Permissions": {
                 "Share": {
                     "Vorlagen": { "AccessLevel": "Change" },
@@ -136,7 +136,7 @@
         },
         {
             "Name": "GL",
-            "ouPath": "ou=Gruppen,dc=gr3,dc=lab0304,dc=local",
+            "ouPath": "ou=Gruppen,dc=gr3,dc=laba304,dc=local",
             "Permissions": {
                 "Share": {
                     "Vorlagen": { "AccessLevel": "Change" },
@@ -157,51 +157,51 @@
     "OUs": [
         {
             "Name": "Gruppen",
-            "DistinguishedName": "OU=Gruppen,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=Gruppen,DC=gr3,DC=laba304,DC=local"
         },
         {
             "Name": "Oeffentlich",
-            "DistinguishedName": "OU=Oeffentlich,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=Oeffentlich,DC=gr3,DC=laba304,DC=local"
         },
         {
             "Name": "Computers",
-            "DistinguishedName": "OU=Computers,OU=Oeffentlich,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=Computers,OU=Oeffentlich,DC=gr3,DC=laba304,DC=local"
         },
         {
             "Name": "Users",
-            "DistinguishedName": "OU=Users,OU=Oeffentlich,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=Users,OU=Oeffentlich,DC=gr3,DC=laba304,DC=local"
         },
         {
             "Name": "Intern",
-            "DistinguishedName": "OU=Intern,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=Intern,DC=gr3,DC=laba304,DC=local"
         },
         {
             "Name": "Mitarbeiter",
-            "DistinguishedName": "OU=Mitarbeiter,OU=Intern,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=Mitarbeiter,OU=Intern,DC=gr3,DC=laba304,DC=local"
         },
         {
             "Name": "Computer",
-            "DistinguishedName": "OU=Computer,OU=Intern,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=Computer,OU=Intern,DC=gr3,DC=laba304,DC=local"
         },
         {
             "Name": "MA-Auskunft",
-            "DistinguishedName": "OU=MA-Auskunft,OU=Mitarbeiter,OU=Intern,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=MA-Auskunft,OU=Mitarbeiter,OU=Intern,DC=gr3,DC=laba304,DC=local"
         },
         {
             "Name": "MA-Beratung",
-            "DistinguishedName": "OU=MA-Beratung,OU=Mitarbeiter,OU=Intern,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=MA-Beratung,OU=Mitarbeiter,OU=Intern,DC=gr3,DC=laba304,DC=local"
         },
         {
             "Name": "MA-Technik",
-            "DistinguishedName": "OU=MA-Technik,OU=Mitarbeiter,OU=Intern,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=MA-Technik,OU=Mitarbeiter,OU=Intern,DC=gr3,DC=laba304,DC=local"
         },
         {
             "Name": "MA-STB",
-            "DistinguishedName": "OU=MA-STB,OU=Mitarbeiter,OU=Intern,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=MA-STB,OU=Mitarbeiter,OU=Intern,DC=gr3,DC=laba304,DC=local"
         },
         {
             "Name": "MA-GL",
-            "DistinguishedName": "OU=MA-GL,OU=Mitarbeiter,OU=Intern,DC=gr3,DC=lab0304,DC=local"
+            "DistinguishedName": "OU=MA-GL,OU=Mitarbeiter,OU=Intern,DC=gr3,DC=laba304,DC=local"
         }
     ],
     "Folders": [

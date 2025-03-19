@@ -44,7 +44,7 @@
 [string]$configFolderPath = $PSScriptRoot + "\configs\" # Folder containing the Config Files for the Domain Configuration
 [string]$configFilePath = $configFolderPath + "domainConfig.json" # JSON File containing Users, Groups to assign to them, and other attributes for User creation.
 [string]$logFilePath = $PSScriptRoot + "DomainConfig.log" # Log File for the Domain Configuration Script
-[string]$localDomain = "Lab0304.local" # Domain Name of the Local Environment
+[string]$localDomain = "laba304.local" # Domain Name of the Local Environment
 [string]$internetDomain = "biz-rundstadt.de" # Internet Routable/Searchable Domain Name
 [string]$serverUNC = "\\$env:COMPUTERNAME" # UNC Path to the Server
 [int]$maxLogSize = 2MB # Maximum Size of the Log File before it is pruned
