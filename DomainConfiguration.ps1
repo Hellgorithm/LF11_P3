@@ -20,7 +20,7 @@
 
 .NOTES
     File Name      : DomainConfiguration.ps1
-    Author         : Aaron Kain
+    Author         : HGR
     Prerequisite   : PowerShell 5.1 or later
                      Active Directory module
                      Administrative privileges
@@ -48,7 +48,8 @@
 [string]$internetDomain = "biz-rundstadt.de" # Internet Routable/Searchable Domain Name
 [string]$serverUNC = "\\$env:COMPUTERNAME" # UNC Path to the Server
 [int]$maxLogSize = 2MB # Maximum Size of the Log File before it is pruned
-[string]$noPrintGroup = "grp_Besucher" # Group that is denied print access to all printers
+[string]$groupPrefix = "grp_" # Prefix for all Groups created by the script
+[string]$noPrintGroup = $groupPrefix + "Besucher" # Group that is denied print access to all printers. If null, no group is denied print access. DONT REMOVE THE PREFIX UNLESS NULL!
 $allUsers = New-Object -TypeName System.Collections.Generic.List[System.Object] # List containing all Users to be created, is filled once the Config File is read
 $allShares = New-Object -TypeName System.Collections.Generic.List[System.Object] # List containing all Network Shares to be created, is filled once the Config File is read.
 
@@ -155,12 +156,13 @@ function readConfigs($selConfig){
             $Script:dhcpConfig = $DataBlob.DHCP
         }
     }
+    # Import Users, assign them to OUs automatically if possible. If not, prompt User.
     foreach ($user in $userConfig){
-        if (($user.Groups.Count -gt 0) -and ($user.Groups.Count -le 1)){
-            $private:userOuPath = $ouConfig | Where-Object {$_.Name -eq $user.Groups[0]} | Select-Object -ExpandProperty DistinguishedName
+        if (($user.GroupMemberships.Count -gt 0) -and ($user.GroupMemberships.Count -le 1)){
+            $private:userOuPath = $ouConfig | Where-Object {$_.Name -like "*$($user.GroupMemberships[0])"} | Select-Object -ExpandProperty DistinguishedName
         }
         else {
-            $private:ouChoice = Read-Host( "Multiple Groups detected. Enter the OU Name for User $($user.Name) $($user.Surname)`r`nGroup Memberships: $($user.Groups)`r`nDISCLAIMER: Only OUs defined in the Config File will be accepted.")
+            $private:ouChoice = Read-Host("Multiple Groups detected. Enter the OU Name for User $($user.Name) $($user.Surname)`r`nGroup Memberships: $($user.GroupMemberships)`r`nDISCLAIMER: Only OUs defined in the Config File will be accepted.")
             $private:userOuPath = $ouConfig | Where-Object {$_.Name -eq $private:ouChoice} | Select-Object -ExpandProperty DistinguishedName
         }
         $allUsers.Add([User]::new($user.Name, $user.Surname, $user.loginName, $user.Groups, $serverUNC, $private:userOuPath, $internetDomain))
@@ -187,7 +189,7 @@ function registerGroups(){
     foreach ($group in $groupConfig){
         Write-LogMessage("Creating Group $($group.name)", $null)
         try {
-            New-ADGroup -Name $group.name -GroupScope $group.scope -GroupCategory $group.category -Path $group.ouPath
+            New-ADGroup -Name ($groupPrefix + $group.name) -Path $group.ouPath
             Write-Host("Group $($group.name) created successfully.") -ForegroundColor Green
         }
         catch {
@@ -206,9 +208,25 @@ function registerUsers(){
             New-ADUser -Name $user.name -Surname $user.surname -SamAccountName $user.loginName -AccountPassword $startPW -Enabled $true -Path $user.ouPath -EmailAddress $user.mailAddress -HomeDrive "H:" -HomeDirectory $user.homeShare -ChangePasswordAtLogon $true
             Write-Host("User $($user.loginName) created successfully.") -ForegroundColor Green
             foreach ($group in $user.groups){
-                Add-ADGroupMember -Identity $group -Members $user.loginName
-                Write-Host("User $($user.loginName) added to Group $($group).") -ForegroundColor Green
+                try {
+                    
+                    if ($group -ne "Domain Admins"){
+                        Add-ADGroupMember -Identity ($groupPrefix + $group) -Members $user.loginName
+                        Write-Host("User $($user.loginName) added to Group $($groupPrefix + $group).") -ForegroundColor Green
+                    }
+                    else {
+                        Add-ADGroupMember -Identity "Domain Admins" -Members $user.loginName
+                        Write-Host("User $($user.loginName) added to Group Domain Admins.") -ForegroundColor Green
+                    }
+                } 
+                catch {
+                    Write-LogMessage("Error adding User $($user.loginName) to Group $($group)", $_)
+                    Write-Host("Error adding User $($user.loginName) to Group $($group).") -ForegroundColor Red
+                }
+                
             }
+            Add-ADGroupMember -Identity "Domain Users" -Members $user.loginName
+            Write-Host("User $($user.loginName) added to Group Domain Users.") -ForegroundColor Green
         }
         catch {
             Write-LogMessage("Error creating User $($user.loginName)", $_)
@@ -243,22 +261,27 @@ function createNetworkShares(){
         
         #Set NTFS Permissions
         $acl = Get-Acl -Path $share.path
-        foreach ($key in $share.ntfsPermissions){
-            $private:keyName = $($key.GetEnumerator() | Select-Object Key).Key
+        foreach ($key in $share.ntfsPermissions.Keys){
 
-            $fileSystemACLArgumentList = @($private:keyName, $share.ntfsPermissions[$private:keyName], "ContainerInherit, ObjectInherit", "None", "Allow")
-            $fileSystemACLR = New-Object System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemACLArgumentList
+            switch ($share.ntfsPermissions[$key]) {
+                "FullAccess" { $private:fileSystemACLArgumentList = @(($groupPrefix + $key), "FullControl", "ContainerInherit, ObjectInherit", "None", "Allow") }
+                "Modify" { $private:fileSystemACLArgumentList = @(($groupPrefix + $key), "Modify", "ContainerInherit, ObjectInherit", "None", "Allow") }
+                "ReadAndExecute" { $private:fileSystemACLArgumentList = @(($groupPrefix + $key), "ReadAndExecute", "ContainerInherit, ObjectInherit", "None", "Allow") }
+                Default {}
+            }
+            $private:fileSystemACLR = New-Object System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemACLArgumentList
+            $acl.SetAccessRuleProtection($false, $false) # Preserve existing permissions and inheritance
             $acl.AddAccessRule($fileSystemACLR)
         }
         Set-Acl -Path $share.path -AclObject $acl
         New-SmbShare -Name $share.name -Path $share.path
 
         #Set Share Permissions
-        foreach ($key in $share.sharePermissions){
-            switch ($key) {
-                "FullAccess" { Grant-SmbShareAccess -Name $share.name -AccountName $share.sharePermissions[$key] -AccessRight Full }
-                "Write" { Grant-SmbShareAccess -Name $share.name -AccountName $share.sharePermissions[$key] -AccessRight Write }
-                "Read" { Grant-SmbShareAccess -Name $share.name -AccountName $share.sharePermissions[$key] -AccessRight Read }
+        foreach ($key in $share.sharePermissions.Keys){
+            switch ($share.sharePermissions[$key]) {
+                "FullAccess" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupPrefix + $key} -AccessRight Full }
+                "Change" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupPrefix + $key} -AccessRight Write }
+                "Read" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupPrefix + $key} -AccessRight Read }
                 Default {}
             }
         }
@@ -322,7 +345,7 @@ function configurePrinters() {
 
 function configureDHCP(){
     if (!(Get-WindowsFeature -Name DHCP | Where Installed)){
-        Install-WindowsFeature -Name DHCP -IncludeManagementTools
+        Install-WindowsFeature -Name DHCP -IncludeManagementTools 
     }
     Add-DhcpServerInDC -DnsName "$env:COMPUTERNAME.$localDomain" -IpAddress $dhcpConfig.DnsServer
 

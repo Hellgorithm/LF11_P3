@@ -4,66 +4,66 @@
             "Name": "Thomas",
             "Surname": "Mueller",
             "LoginName": "muell01",
-            "GroupMemberships": ["grp_Auskunft", "grp_Alle-MA"]
+            "GroupMemberships": ["Auskunft", "Alle-MA"]
         },
         {
             "Name": "Tom",
             "Surname": "Schneider",
             "LoginName": "schneid02",
-            "GroupMemberships": ["grp_Alle-MA","grp_Auskunft"]
+            "GroupMemberships": ["Alle-MA","Auskunft"]
         },
         {
             "Name": "Siegfried",
             "Surname": "Lehmann",
             "LoginName": "lehma03",
-            "GroupMemberships": ["grp_Auskunft", "grp_Technik", "grp_Alle-MA"]
+            "GroupMemberships": ["Auskunft", "Technik", "Alle-MA"]
         },
         {
             "Name": "Michael",
             "Surname": "Krause",
             "LoginName": "kraus04",
-            "GroupMemberships":["grp_STB", "grp_Alle-MA"]
+            "GroupMemberships":["STB", "Alle-MA"]
         },
         {
             "Name": "Herbert",
             "Surname": "Hofmann",
             "LoginName": "hofma05",
-            "GroupMemberships":["grp_Beratung", "grp_Alle-MA", "grp_GL", "grp_Technik", "grp_STB", "grp_Auskunft"]
+            "GroupMemberships":["Beratung", "Alle-MA", "GL", "Technik", "STB", "Auskunft"]
         },
         {
             "Name": "Marianne",
             "Surname": "Mayer",
             "LoginName": "mayer06",
-            "GroupMemberships":["grp_STB", "grp_Alle-MA"]
+            "GroupMemberships":["STB", "Alle-MA"]
         },
         {
             "Name": "Alex",
             "Surname": "Schulze",
             "LoginName": "schul07",
-            "GroupMemberships":["grp_Beratung", "grp_Alle-MA"]
+            "GroupMemberships":["Beratung", "Alle-MA"]
         },
         {
             "Name":"Annette",
             "Surname":"Wolf",
             "LoginName":"wolf08",
-            "GroupMemberships":["grp_Beratung", "grp_Alle-MA"]
+            "GroupMemberships":["Beratung", "Alle-MA"]
         },
         {
             "Name":"Angela",
             "Surname":"Merkel",
             "LoginName":"merke09",
-            "GroupMemberships":["grp_Beratung", "grp_Alle-MA"]
+            "GroupMemberships":["Beratung", "Alle-MA"]
         },
         {
             "Name":"ADM",
             "Surname":"Systemprofi",
             "LoginName":"admsys",
-            "GroupMemberships":["grp_Technik","Domain Admins"]
+            "GroupMemberships":["Technik","Domain Admins"]
         }
     ],
     "Groups": [
         {
-            "Name": "grp_Auskunft",
+            "Name": "Auskunft",
             "ouPath": "ou=Gruppen,dc=gr3,dc=lab0304,dc=local",
             "Permissions": {
                 "Share": {
@@ -81,7 +81,7 @@
             }
         },
         {
-            "Name": "grp_STB",
+            "Name": "STB",
             "ouPath": "ou=Gruppen,dc=gr3,dc=lab0304,dc=local",
             "Permissions": {
                 "Share": {
@@ -99,7 +99,7 @@
             }
         },
         {
-            "Name": "grp_Beratung",
+            "Name": "Beratung",
             "ouPath": "ou=Gruppen,dc=gr3,dc=lab0304,dc=local",
             "Permissions": {
                 "Share": {
@@ -117,7 +117,7 @@
             }
         },
         {
-            "Name": "grp_Technik",
+            "Name": "Technik",
             "ouPath": "ou=Gruppen,dc=gr3,dc=lab0304,dc=local",
             "Permissions": {
                 "Share": {
@@ -135,7 +135,7 @@
             }
         },
         {
-            "Name": "grp_GL",
+            "Name": "GL",
             "ouPath": "ou=Gruppen,dc=gr3,dc=lab0304,dc=local",
             "Permissions": {
                 "Share": {
@@ -210,18 +210,18 @@
             "Path": "C:\\Freigaben\\Vorlagen",
             "Owner": "admsys",
             "NTFSPermissions": {
-                "grp_Auskunft": "ReadAndExecute",
-                "grp_STB": "ReadAndExecute",
-                "grp_Beratung": "ReadAndExecute",
-                "grp_Technik": "Modify",
-                "grp_GL": "Modify"
+                "Auskunft": "ReadAndExecute",
+                "STB": "ReadAndExecute",
+                "Beratung": "ReadAndExecute",
+                "Technik": "Modify",
+                "GL": "Modify"
             },
             "SharePermissions": {
-                "grp_Auskunft": "Read",
-                "grp_STB": "Read",
-                "grp_Beratung": "Read",
-                "grp_Technik": "Change",
-                "grp_GL": "Change"
+                "Auskunft": "Read",
+                "STB": "Read",
+                "Beratung": "Read",
+                "Technik": "Change",
+                "GL": "Change"
             }
         },
         {
@@ -229,18 +229,18 @@
             "Path": "C:\\Freigaben\\Transfer",
             "Owner": "admsys",
             "NTFSPermissions": {
-                "grp_Auskunft": "Modify",
-                "grp_STB": "Modify",
-                "grp_Beratung": "Modify",
-                "grp_Technik": "Modify",
-                "grp_GL": "Modify"
+                "Auskunft": "Modify",
+                "STB": "Modify",
+                "Beratung": "Modify",
+                "Technik": "Modify",
+                "GL": "Modify"
             },
             "SharePermissions": {
-                "grp_Auskunft": "Change",
-                "grp_STB": "Change",
-                "grp_Beratung": "Change",
-                "grp_Technik": "Change",
-                "grp_GL": "Change"
+                "Auskunft": "Change",
+                "STB": "Change",
+                "Beratung": "Change",
+                "Technik": "Change",
+                "GL": "Change"
             }
         },
         {
@@ -248,10 +248,10 @@
             "Path": "C:\\Freigaben\\Transfer_Ausk",
             "Owner": "admsys",
             "NTFSPermissions": {
-                "grp_Auskunft": "Modify"
+                "Auskunft": "Modify"
             },
             "SharePermissions": {
-                "grp_Auskunft": "Change"
+                "Auskunft": "Change"
             }
         },
         {
@@ -259,12 +259,12 @@
             "Path": "C:\\Freigaben\\Vorlagen_Ausk",
             "Owner": "admsys",
             "NTFSPermissions": {
-                "grp_Auskunft": "ReadAndExecute",
-                "grp_GL": "Modify"
+                "Auskunft": "ReadAndExecute",
+                "GL": "Modify"
             },
             "SharePermissions": {
-                "grp_Auskunft": "Read",
-                "grp_GL": "Change"
+                "Auskunft": "Read",
+                "GL": "Change"
             }         
         },
         {
@@ -272,10 +272,10 @@
             "Path": "C:\\Freigaben\\Transfer_STB",
             "Owner": "admsys",
             "NTFSPermissions": {
-                "grp_STB": "Modify"
+                "STB": "Modify"
             },
             "SharePermissions": {
-                "grp_STB": "Change"
+                "STB": "Change"
             }
         },
         {
@@ -283,12 +283,12 @@
             "Path": "C:\\Freigaben\\Vorlagen_STB",
             "Owner": "admsys",
             "NTFSPermissions": {
-                "grp_STB": "ReadAndExecute",
-                "grp_GL": "Modify"
+                "STB": "ReadAndExecute",
+                "GL": "Modify"
             },
             "SharePermissions": {
-                "grp_STB": "Read",
-                "grp_GL": "Change"
+                "STB": "Read",
+                "GL": "Change"
             }
         },
         {
@@ -296,10 +296,10 @@
             "Path": "C:\\Freigaben\\Transfer_Beratung",
             "Owner": "admsys",
             "NTFSPermissions": {
-                "grp_Beratung": "Modify"
+                "Beratung": "Modify"
             },
             "SharePermissions": {
-                "grp_Beratung": "Change"
+                "Beratung": "Change"
             }
         },
         {
@@ -307,12 +307,12 @@
             "Path": "C:\\Freigaben\\Vorlagen_Beratung",
             "Owner": "admsys",
             "NTFSPermissions": {
-                "grp_Beratung": "ReadAndExecute",
-                "grp_GL": "Modify"
+                "Beratung": "ReadAndExecute",
+                "GL": "Modify"
             },
             "SharePermissions": {
-                "grp_Beratung": "Read",
-                "grp_GL": "Change"
+                "Beratung": "Read",
+                "GL": "Change"
             }
         },
         {
@@ -320,10 +320,10 @@
             "Path": "C:\\Freigaben\\Transfer_Technik",
             "Owner": "admsys",
             "NTFSPermissions": {
-                "grp_Technik": "Modify"
+                "Technik": "Modify"
             },
             "SharePermissions": {
-                "grp_Technik": "Change"
+                "Technik": "Change"
             }
         },
         {
@@ -331,12 +331,12 @@
             "Path": "C:\\Freigaben\\Vorlagen_Technik",
             "Owner": "admsys",
             "NTFSPermissions": {
-                "grp_Technik": "ReadAndExecute",
-                "grp_GL": "Modify"
+                "Technik": "ReadAndExecute",
+                "GL": "Modify"
             },
             "SharePermissions": {
-                "grp_Technik": "Read",
-                "grp_GL": "Change"
+                "Technik": "Read",
+                "GL": "Change"
             }
         },
         {
@@ -344,10 +344,10 @@
             "Path": "C:\\Freigaben\\Transfer_GL",
             "Owner": "admsys",
             "NTFSPermissions": {
-                "grp_GL": "FullAccess"
+                "GL": "FullAccess"
             },
             "SharePermissions": {
-                "grp_GL": "FullAccess"
+                "GL": "FullAccess"
             }
         },
         {
@@ -355,10 +355,10 @@
             "Path": "C:\\Freigaben\\Vorlagen_GL",
             "Owner": "admsys",
             "NTFSPermissions": {
-                "grp_GL": "FullAccess"
+                "GL": "FullAccess"
             },
             "SharePermissions": {
-                "grp_GL": "FullAccess"
+                "GL": "FullAccess"
             }
         }
     ],
@@ -379,7 +379,7 @@
             "Driver": "HP LaserJet 5",
             "PortName": "IP_172.25.53.10",
             "PrintPermissions": {
-                "Allow": ["grp_Auskunft", "grp_STB", "grp_Beratung", "grp_Technik", "grp_GL"],
+                "Allow": ["Auskunft", "STB", "Beratung", "Technik", "GL"],
                 "Deny": []
             }
         }
