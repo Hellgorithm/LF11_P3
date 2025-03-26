@@ -64,15 +64,19 @@ class User {
     [string[]]$groups
     [string]$homeShare
     [string]$ouPath
+    [string]$UPN
 
     User($name, $surname, $loginName, $groups, $serverUNC, $ouPath, $internetDomain){
         $this.name = $name
         $this.surname = $surname
         $this.loginName = $loginName
-        $this.mailAddress = $name + "." + $surname + $internetDomain
+        $this.mailAddress = $name + "." + $surname + "@" + $internetDomain
         $this.groups = $groups
         $this.homeShare = $serverUNC + $loginName + "$"
         $this.ouPath = $ouPath
+        $this.UPN = $loginName + "@" + $script:localDomain
+
+
     }
     User([hashtable]$params){
         $this.name = $params.Name
@@ -82,6 +86,7 @@ class User {
         $this.groups = $params.Groups
         $this.homeShare = $params.HomeShare
         $this.ouPath = $params.OUPath
+        $this.UPN = $params.Name + "@" + $script:localDomain
     }
     # [void] DisplayInfo() {
     #     Write-Host "Name: $($this.Name), Surname: $($this.Surname)"
@@ -205,7 +210,7 @@ function registerUsers(){
     foreach ($user in $allUsers){
         Write-LogMessage("Creating User $($user.loginName)", $null)
         try {
-            New-ADUser -Name $user.name -Surname $user.surname -SamAccountName $user.loginName -AccountPassword $startPW -Enabled $true -Path $user.ouPath -EmailAddress $user.mailAddress -HomeDrive "H:" -HomeDirectory $user.homeShare -ChangePasswordAtLogon $true
+            New-ADUser -Name $user.name -Surname $user.surname -DisplayName ($user.surname + ", " + $user.name) -UserPrincipalName $user.UPN -SamAccountName $user.loginName -AccountPassword $startPW -Enabled $true -Path $user.ouPath -EmailAddress $user.mailAddress -HomeDrive "H:" -HomeDirectory $user.homeShare -ChangePasswordAtLogon $true
             Write-Host("User $($user.loginName) created successfully.") -ForegroundColor Green
             foreach ($group in $user.groups){
                 try {
@@ -243,7 +248,12 @@ function createNetworkShares(){
         try {
             $private:folderPathParts = $share.Path -split "\\"
             foreach ($subFolder in $folderPathParts){
-                $rejoinedPathList.Add($folderPathParts[$index] + "\\" + $subFolder)
+                if ($index -eq 0){
+                    $rejoinedPathList.Add($subFolder)
+                }
+                else {
+                    $rejoinedPathList.Add($folderPathParts[$index] + "\\" + $subFolder)
+                }
                 $private:rejoinedPath = [string]::Concat($rejoinedPathList)
                 if (!(Test-Path $rejoinedPath)){
                     New-Item -LiteralPath $rejoinedPath -ItemType Directory
