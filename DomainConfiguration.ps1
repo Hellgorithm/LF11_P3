@@ -177,7 +177,7 @@ function readConfigs($selConfig){
             Remove-Variable -Name cleanedGroups
         }
         
-        [System.Collections.Generic.List[string]]$private:cleanedGroups
+        $private:cleanedGroups = New-Object -TypeName System.Collections.Generic.List[string]
         foreach ($grp in $user.GroupMemberships){
             if ($noneOuGroups -notcontains $grp){
                 $cleanedGroups.Add($grp)
