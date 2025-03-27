@@ -58,7 +58,7 @@
     "Besucher",
     "Alle-MA"
 ) # Groups that will be ignored when attempting to Auto-Assign OUs to Users during the reading of config files
-$noneOuGroups = $noneOuGroups | ForEach-Object { $groupPrefix + $_ } # Add the Group Prefix to the Group Names
+#$noneOuGroups = $noneOuGroups | ForEach-Object { $groupPrefix + $_ } # Add the Group Prefix to the Group Names
 $allUsers = New-Object -TypeName System.Collections.Generic.List[System.Object] # List containing all Users to be created, is filled once the Config File is read
 $allShares = New-Object -TypeName System.Collections.Generic.List[System.Object] # List containing all Network Shares to be created, is filled once the Config File is read.
 
