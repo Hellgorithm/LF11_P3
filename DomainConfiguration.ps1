@@ -177,10 +177,10 @@ function readConfigs($selConfig){
             Remove-Variable -Name cleanedGroups
         }
         
-        $private:cleanedGroups = foreach ($grp in $user.GroupMemberships){ {
+        [System.Collections.Generic.List[string]]$private:cleanedGroups
+        foreach ($grp in $user.GroupMemberships){
             if ($noneOuGroups -notcontains $grp){
-                $grp
-            }
+                $cleanedGroups.Add($grp)
             }
         } # Array to store the group names without Groups that cant be assigned an OU automatically
 
