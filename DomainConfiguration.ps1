@@ -234,13 +234,12 @@ function registerUsers(){
     foreach ($user in $allUsers){
         Write-LogMessage("Creating User $($user.loginName)", $null)
         try {
-            New-ADUser -Name $user.name -Surname $user.surname -DisplayName ($user.surname + ", " + $user.name) -UserPrincipalName $user.UPN -SamAccountName $user.loginName -AccountPassword $startPW -Enabled $true -Path $user.ouPath -EmailAddress $user.mailAddress -HomeDrive "H:" -HomeDirectory $user.homeShare -ChangePasswordAtLogon $true
+            New-ADUser -GivenName $user.name -Surname $user.surname -Name ($user.surname + ", " + $user.name) -DisplayName ($user.surname + ", " + $user.name) -UserPrincipalName $user.UPN -SamAccountName $user.loginName -AccountPassword $startPW -Enabled $true -Path $user.ouPath -EmailAddress $user.mailAddress -HomeDrive "H:" -HomeDirectory $user.homeShare -ChangePasswordAtLogon $true
             Write-Host("User $($user.loginName) created successfully.") -ForegroundColor Green
             foreach ($group in $user.groups){
                 try {
-                    
                     if ($group -ne "Domain Admins"){
-                        Add-ADGroupMember -Identity ($groupPrefix + $group) -Members $user.loginName
+                        Add-ADGroupMember -Identity ("OU=" + $groupPrefix + "," + $group.DistinguishedName) -Members $user.loginName
                         Write-Host("User $($user.loginName) added to Group $($groupPrefix + $group).") -ForegroundColor Green
                     }
                     else {
@@ -254,8 +253,8 @@ function registerUsers(){
                 }
                 
             }
-            Add-ADGroupMember -Identity "Domänen-Benutzer" -Members $user.loginName
-            Write-Host("User $($user.loginName) added to Group Domain Users.") -ForegroundColor Green
+            # Add-ADGroupMember -Identity "Domänen-Benutzer" -Members $user.loginName
+            # Write-Host("User $($user.loginName) added to Group Domain Users.") -ForegroundColor Green
         }
         catch {
             Write-LogMessage("Error creating User $($user.loginName)", $_)
@@ -305,7 +304,7 @@ function createNetworkShares(){
                 "FullAccess" { $private:fileSystemACLArgumentList = @(($groupPrefix + $key), "FullControl", "ContainerInherit, ObjectInherit", "None", "Allow") }
                 "Modify" { $private:fileSystemACLArgumentList = @(($groupPrefix + $key), "Modify", "ContainerInherit, ObjectInherit", "None", "Allow") }
                 "ReadAndExecute" { $private:fileSystemACLArgumentList = @(($groupPrefix + $key), "ReadAndExecute", "ContainerInherit, ObjectInherit", "None", "Allow") }
-                Default {}
+                Default {Write-LogMessage("Error setting NTFS Permissions for $($share.name)", "Invalid NTFS Permission (Hit default case)")}
             }
             $private:fileSystemACLR = New-Object System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemACLArgumentList
             $acl.SetAccessRuleProtection($false, $false) # Preserve existing permissions and inheritance
@@ -320,7 +319,7 @@ function createNetworkShares(){
                 "FullAccess" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupPrefix + $key} -AccessRight Full }
                 "Change" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupPrefix + $key} -AccessRight Write }
                 "Read" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupPrefix + $key} -AccessRight Read }
-                Default {}
+                Default {Write-LogMessage("Error setting Share Permissions for $($share.name)", "Invalid Share Permission (Hit default case)")}
             }
         }
     }
