@@ -1,4 +1,5 @@
-﻿<#
+﻿
+<#
 .SYNOPSIS
     Domain configuration script for automated setup of a Microsoft ADDS environment.
 
@@ -50,10 +51,19 @@
 [int]$maxLogSize = 2MB # Maximum Size of the Log File before it is pruned
 [string]$groupPrefix = "grp_" # Prefix for all Groups created by the script
 [string]$noPrintGroup = $groupPrefix + "Besucher" # Group that is denied print access to all printers. If null, no group is denied print access. DONT REMOVE THE PREFIX UNLESS NULL!
+[System.Collections.Generic.List[string]]$noneOuGroups = @(
+    "Domain Admins",
+    "Domänen-Admins",
+    "Domänen-Benutzer",
+    "Besucher",
+    "Alle-MA"
+) # Groups that will be ignored when attempting to Auto-Assign OUs to Users during the reading of config files
+$noneOuGroups = $noneOuGroups | ForEach-Object { $groupPrefix + $_ } # Add the Group Prefix to the Group Names
 $allUsers = New-Object -TypeName System.Collections.Generic.List[System.Object] # List containing all Users to be created, is filled once the Config File is read
 $allShares = New-Object -TypeName System.Collections.Generic.List[System.Object] # List containing all Network Shares to be created, is filled once the Config File is read.
 
 #endregion Global Variables
+
 
 #region Classes
 class User {
@@ -163,7 +173,15 @@ function readConfigs($selConfig){
     }
     # Import Users, assign them to OUs automatically if possible. If not, prompt User.
     foreach ($user in $userConfig){
-        if (($user.GroupMemberships.Count -gt 0) -and ($user.GroupMemberships.Count -le 1)){
+        if (Get-Variable -Name cleanedGroups -ErrorAction SilentlyContinue){
+            Remove-Variable -Name cleanedGroups
+        }
+        
+        $private:cleanedGroups = foreach ($grp in $noneOuGroups) {
+            $user.GroupMemberships | Where-Object $_ -ne $grp
+        } # Array to store the group names without Groups that cant be assigned an OU automatically
+
+        if (($cleanedGroups -gt 0) -and ($cleanedGroups -le 1)){
             $private:userOuPath = $ouConfig | Where-Object {$_.Name -like "*$($user.GroupMemberships[0])"} | Select-Object -ExpandProperty DistinguishedName
         }
         else {
@@ -176,6 +194,7 @@ function readConfigs($selConfig){
         $allShares.Add([networkShare]::new($share.Name, $share.Path, $share.ntfsPermissions, $share.SharePermissions))
     }
 }
+
 
 # Creates Custom OUs and similar within the Domain
 function createDomainStructure(){
@@ -206,7 +225,7 @@ function registerGroups(){
 
 # Handles Importing Users and Registering them in ADS
 function registerUsers(){
-    $Private:startPW = ConvertTo-SecureString $(Read-Host -Prompt "Enter the starting Password for the new Users.") -AsPlainText -Force
+    $Private:startPW = Read-Host -Prompt "Enter the starting Password for the new Users." -AsSecureString
     foreach ($user in $allUsers){
         Write-LogMessage("Creating User $($user.loginName)", $null)
         try {
@@ -241,22 +260,27 @@ function registerUsers(){
 }
 
 function createNetworkShares(){
-    $private:rejoinedPathList = New-Object -TypeName System.Collections.Generic.List[string]
     foreach($share in $allShares){
         $private:index = 0
         # Traverse the share Folder path, creating the necessary folders
         try {
+            if (Get-Variable -Name rejoinedPathList -ErrorAction SilentlyContinue){
+                Remove-Variable -Name rejoinedPathList
+            }
+
+            $private:rejoinedPathList = New-Object -TypeName System.Collections.Generic.List[string]
             $private:folderPathParts = $share.Path -split "\\"
+
             foreach ($subFolder in $folderPathParts){
                 if ($index -eq 0){
-                    $rejoinedPathList.Add($subFolder)
+                    $rejoinedPathList.Add($subFolder + "\\")
                 }
                 else {
-                    $rejoinedPathList.Add($folderPathParts[$index] + "\\" + $subFolder)
+                    $rejoinedPathList.Add($folderPathParts[$index] + "\\")
                 }
                 $private:rejoinedPath = [string]::Concat($rejoinedPathList)
                 if (!(Test-Path $rejoinedPath)){
-                    New-Item -LiteralPath $rejoinedPath -ItemType Directory
+                    New-Item -Path $rejoinedPath -ItemType Directory
                 }
                 $index++
             }
@@ -356,7 +380,24 @@ function configureDHCP(){
     if (!(Get-WindowsFeature -Name DHCP | Where Installed)){
         Install-WindowsFeature -Name DHCP -IncludeManagementTools 
     }
-    Add-DhcpServerInDC -DnsName "$env:COMPUTERNAME.$localDomain" -IpAddress $dhcpConfig.DnsServer
+
+    # Check if DHCP server is authorized in Active Directory
+    $existingDhcpServer = Get-DhcpServerInDC | Where-Object { $_.DnsName -eq "$env:COMPUTERNAME.$localDomain" }
+    if (!$existingDhcpServer) {
+        Write-LogMessage("DHCP server not authorized, authorizing it now", $null)
+        try {
+            Add-DhcpServerInDC -DnsName "$env:COMPUTERNAME.$localDomain" -IpAddress $dhcpConfig.DnsServer
+            Write-Host("DHCP server authorized successfully") -ForegroundColor Green
+        }
+        catch {
+            Write-LogMessage("Error authorizing DHCP server", $_)
+            Write-Host("Error authorizing DHCP server") -ForegroundColor Red
+        }
+    }
+    else {
+        Write-LogMessage("DHCP server already authorized, skipping authorization", $null)
+        Write-Host("DHCP server already authorized") -ForegroundColor Green
+    }
 
     # Set DHCP Scope
     Add-DhcpServerv4Scope -Name $dhcpConfig.Name -StartRange $dhcpConfig.ScopeStart -EndRange $dhcpConfig.ScopeEnd -SubnetMask $dhcpConfig.SubnetMask -LeaseDuration $dhcpConfig.LeaseDuration -State Active
@@ -364,6 +405,7 @@ function configureDHCP(){
     # Set DHCP Options
     # $private:scopeID = Get-DhcpServerv4Scope -ComputerName $env:COMPUTERNAME | Where-Object {$_.Name -eq $dhcpConfig.Name} | Select-Object -ExpandProperty ScopeId
     Set-DhcpServerV4OptionValue -ScopeId $dhcpConfig.ScopeID -DnsServer $dhcpConfig.DnsServer -Router $dhcpConfig.Gateway -DnsDomain $localDomain
+    Write-Host("DHCP Scope and Options configured successfully") -ForegroundColor Green
 }
 
 #endregion Helper Functions
