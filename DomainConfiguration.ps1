@@ -184,12 +184,14 @@ function readConfigs($selConfig){
             }
         } # Array to store the group names without Groups that cant be assigned an OU automatically
 
-        if (($cleanedGroups -gt 0) -and ($cleanedGroups -le 1)){
-            $private:userOuPath = $ouConfig | Where-Object {$_.Name -like "*$($user.GroupMemberships[0])"} | Select-Object -ExpandProperty DistinguishedName
+        if (($cleanedGroups.Count -gt 0) -and ($cleanedGroups.Count -le 1)){
+            $private:userOuPath = $ouConfig | Where-Object {$_.Name -like "*$($user.GroupMemberships[0])"}
+            $userOuPath = "OU=" + $userOuPath.Name + "," + $userOuPath.DistinguishedName
         }
         else {
             $private:ouChoice = Read-Host("Multiple Groups detected. Enter the OU Name for User $($user.Name) $($user.Surname)`r`nGroup Memberships: $($user.GroupMemberships)`r`nDISCLAIMER: Only OUs defined in the Config File will be accepted.")
-            $private:userOuPath = $ouConfig | Where-Object {$_.Name -eq ("MA-" + $ouChoice)} | Select-Object -ExpandProperty DistinguishedName
+            $private:userOuPath = $ouConfig | Where-Object {$_.Name -eq ("MA-" + $ouChoice)}
+            $userOuPath = "OU=" + $userOuPath.Name + "," + $userOuPath.DistinguishedName
         }
         $allUsers.Add([User]::new($user.Name, $user.Surname, $user.loginName, $user.Groups, $serverUNC, $private:userOuPath, $internetDomain))
     }
