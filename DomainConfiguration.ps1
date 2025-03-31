@@ -299,15 +299,36 @@ function createNetworkShares(){
         #Set NTFS Permissions
         $acl = Get-Acl -Path $share.path
         foreach ($key in $share.ntfsPermissions.Keys){
-
+            $private:groupName = $groupPrefix + $key
             switch ($share.ntfsPermissions[$key]) {
-                "FullAccess" { $private:fileSystemACLArgumentList = @(($groupPrefix + $key), "FullControl", "ContainerInherit, ObjectInherit", "None", "Allow") }
-                "Modify" { $private:fileSystemACLArgumentList = @(($groupPrefix + $key), "Modify", "ContainerInherit, ObjectInherit", "None", "Allow") }
-                "ReadAndExecute" { $private:fileSystemACLArgumentList = @(($groupPrefix + $key), "ReadAndExecute", "ContainerInherit, ObjectInherit", "None", "Allow") }
+                "FullAccess" { $private:newACE = @{
+                    IdentityReference = $groupName
+                    FileSystemRights = "FullControl"
+                    InheritanceFlags = "ContainerInherit, ObjectInherit"
+                    PropogationFlags = "None"
+                    AccessControlType = "Allow"
+                    }
+                }
+                "Modify" { $private:newACE = @{
+                    IdentityReference = $groupName 
+                    FileSystemRights = "Modify"
+                    InheritanceFlags = "ContainerInherit, ObjectInherit"
+                    PropogationFlags = "None"
+                    AccessControlType = "Allow"
+                    }
+                }
+                "ReadAndExecute" { $private:newACE = @{
+                    IdentityReference = $groupName
+                    FileSystemRights = "ReadAndExecute"
+                    InheritanceFlags = "ContainerInherit, ObjectInherit"
+                    PropogationFlags = "None"
+                    AccessControlType = "Allow"
+                    } 
+                }
                 Default {Write-LogMessage("Error setting NTFS Permissions for $($share.name)", "Invalid NTFS Permission (Hit default case)")}
             }
-            $private:fileSystemACLR = New-Object System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemACLArgumentList
-            $acl.SetAccessRuleProtection($false, $false) # Preserve existing permissions and inheritance
+            $private:fileSystemACLR = New-Object System.Security.AccessControl.FileSystemAccessRule -ArgumentList @newACE
+            $acl.SetAccessRuleProtection($true, $true) # Preserve existing permissions and disable inheritance
             $acl.AddAccessRule($fileSystemACLR)
         }
         Set-Acl -Path $share.path -AclObject $acl
@@ -315,10 +336,11 @@ function createNetworkShares(){
 
         #Set Share Permissions
         foreach ($key in $share.sharePermissions.Keys){
+            $private:groupName = $groupPrefix + $key
             switch ($share.sharePermissions[$key]) {
-                "FullAccess" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupPrefix + $key} -AccessRight Full }
-                "Change" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupPrefix + $key} -AccessRight Write }
-                "Read" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupPrefix + $key} -AccessRight Read }
+                "FullAccess" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupName} -AccessRight Full }
+                "Change" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupName} -AccessRight Write }
+                "Read" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupName} -AccessRight Read }
                 Default {Write-LogMessage("Error setting Share Permissions for $($share.name)", "Invalid Share Permission (Hit default case)")}
             }
         }
@@ -381,12 +403,20 @@ function configurePrinters() {
 }
 
 function configureDHCP(){
+    # Check if DHCP Feature is installed.
     if (!(Get-WindowsFeature -Name DHCP | Where Installed)){
-        Install-WindowsFeature -Name DHCP -IncludeManagementTools 
+        try {
+            Install-WindowsFeature -Name DHCP -IncludeManagementTools
+        }
+        catch {
+            Write-LogMessage("Error installing DHCP Feature", $_)
+            Write-Host("DHCP Feature not installed`r`nError installing DHCP Feature") -ForegroundColor Red
+        } 
     }
 
     # Check if DHCP server is authorized in Active Directory
-    $existingDhcpServer = Get-DhcpServerInDC | Where-Object { $_.DnsName -eq "$env:COMPUTERNAME.$localDomain" }
+    $existingDHCPServer = Get-DhcpServerInDC | Where-Object { $_.DnsName -eq "$env:COMPUTERNAME.$localDomain" }
+    $existingDHCPScope = Get-DhcpServerv4Scope -ComputerName $env:COMPUTERNAME | Where-Object { $_.Name -eq $dhcpConfig.Name }
     if (!$existingDhcpServer) {
         Write-LogMessage("DHCP server not authorized, authorizing it now", $null)
         try {
@@ -403,13 +433,60 @@ function configureDHCP(){
         Write-Host("DHCP server already authorized") -ForegroundColor Green
     }
 
-    # Set DHCP Scope
-    Add-DhcpServerv4Scope -Name $dhcpConfig.Name -StartRange $dhcpConfig.ScopeStart -EndRange $dhcpConfig.ScopeEnd -SubnetMask $dhcpConfig.SubnetMask -LeaseDuration $dhcpConfig.LeaseDuration -State Active
+    #Check if DHCP Scope already exists, remove if so.
+    if (!$existingDHCPScope) {
+        Write-LogMessage("DHCP scope not found, creating it now", $null)
+        try{
+            Add-DhcpServerv4Scope -Name $dhcpConfig.Name -StartRange $dhcpConfig.ScopeStart -EndRange $dhcpConfig.ScopeEnd -SubnetMask $dhcpConfig.SubnetMask -LeaseDuration $dhcpConfig.LeaseDuration -State Active
+            
+            Set-DhcpServerV4OptionValue -ScopeId $dhcpConfig.ScopeID -DnsServer $dhcpConfig.DnsServer -Router $dhcpConfig.Gateway -DnsDomain $localDomain
+            
+            Write-Host("DHCP Scope and Options configured successfully") -ForegroundColor Green
+            Write-LogMessage("DHCP Scope and Options configured successfully", $null)
+        }
+        catch{
+            Write-LogMessage("Error creating DHCP scope", $_)
+            Write-Host("Error creating DHCP scope") -ForegroundColor Red
+        }
 
-    # Set DHCP Options
-    # $private:scopeID = Get-DhcpServerv4Scope -ComputerName $env:COMPUTERNAME | Where-Object {$_.Name -eq $dhcpConfig.Name} | Select-Object -ExpandProperty ScopeId
-    Set-DhcpServerV4OptionValue -ScopeId $dhcpConfig.ScopeID -DnsServer $dhcpConfig.DnsServer -Router $dhcpConfig.Gateway -DnsDomain $localDomain
-    Write-Host("DHCP Scope and Options configured successfully") -ForegroundColor Green
+    }
+    else {
+        if ($scope) {
+            Write-Host "Found DHCP scope: $($scope.Name) with ID $($scope.ScopeId)" -ForegroundColor Yellow
+            
+            # Prompt for confirmation
+            $confirmation = Read-Host "Are you sure you want to remove this scope? (y/n)"
+            if ($confirmation -eq 'y') {
+                try {
+                    # Remove the scope
+                    Remove-DhcpServerv4Scope -ScopeId $scopeId -Force
+                    Write-Host "DHCP Scope has been removed successfully" -ForegroundColor Green
+                    Write-LogMessage "DHCP Scope has been removed successfully", $null
+                }
+                catch {
+                    Write-LogMessage("Error removing DHCP scope", $_)
+                    Write-Host "Error removing DHCP scope" -ForegroundColor Red
+                }
+                try {
+                    Add-DhcpServerv4Scope -Name $dhcpConfig.Name -StartRange $dhcpConfig.ScopeStart -EndRange $dhcpConfig.ScopeEnd -SubnetMask $dhcpConfig.SubnetMask -LeaseDuration $dhcpConfig.LeaseDuration -State Active
+            
+                    Set-DhcpServerV4OptionValue -ScopeId $dhcpConfig.ScopeID -DnsServer $dhcpConfig.DnsServer -Router $dhcpConfig.Gateway -DnsDomain $localDomain
+
+                    Write-Host("DHCP Scope and Options configured successfully") -ForegroundColor Green
+                    Write-LogMessage("DHCP Scope and Options configured successfully", $null)
+                }
+                catch {
+                    Write-LogMessage("Error creating DHCP scope", $_)
+                    Write-Host("Error creating DHCP scope") -ForegroundColor Red
+                }                
+            }
+            else {
+                Write-Host "Scope removal cancelled" -ForegroundColor Cyan
+                Write-Host "Skipping DHCP scope creation" -ForegroundColor Yellow
+                return
+            }
+        }
+    }
 }
 
 #endregion Helper Functions
