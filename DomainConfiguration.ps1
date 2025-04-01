@@ -238,6 +238,7 @@ function registerUsers(){
         try {
             New-ADUser -GivenName $user.name -Surname $user.surname -Name ($user.surname + ", " + $user.name) -DisplayName ($user.surname + ", " + $user.name) -UserPrincipalName $user.UPN -SamAccountName $user.loginName -AccountPassword $startPW -Enabled $true -Path $user.ouPath -EmailAddress $user.mailAddress -HomeDrive "H:" -HomeDirectory $user.homeShare -ChangePasswordAtLogon $true
             Write-Host("User $($user.loginName) created successfully.") -ForegroundColor Green
+            Write-Host("User Groups: $($user.groups)") -ForegroundColor Cyan
             foreach ($group in $user.groups){
                 try {
                     if ($group -ne "Domain Admins"){
@@ -254,7 +255,6 @@ function registerUsers(){
                     Write-LogMessage("Error adding User $($user.loginName) to Group $($group)", $_)
                     Write-Host("Error adding User $($user.loginName) to Group $($group).") -ForegroundColor Red
                 }
-                
             }
             # Add-ADGroupMember -Identity "Domänen-Benutzer" -Members $user.loginName
             # Write-Host("User $($user.loginName) added to Group Domain Users.") -ForegroundColor Green
