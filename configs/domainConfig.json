@@ -10,7 +10,7 @@
             "Name": "Tom",
             "Surname": "Schneider",
             "LoginName": "schneid02",
-            "GroupMemberships": ["Alle-MA","Auskunft"]
+            "GroupMemberships": ["Auskunft","Alle-MA"]
         },
         {
             "Name": "Siegfried",

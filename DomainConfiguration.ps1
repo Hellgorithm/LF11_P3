@@ -1,5 +1,4 @@
-﻿
-<#
+﻿<#
 .SYNOPSIS
     Domain configuration script for automated setup of a Microsoft ADDS environment.
 
@@ -39,6 +38,9 @@
     https://github.com/Hellgorithm/LF11_P3
 #>
 
+#requires -RunAsAdministrator 
+#requires -Version 5.1
+#requires -Modules ActiveDirectory, PrintManagement
 
 
 #region Global Variables
@@ -82,7 +84,7 @@ class User {
         $this.loginName = $loginName
         $this.mailAddress = $name + "." + $surname + "@" + $internetDomain
         $this.groups = $groups
-        $this.homeShare = $serverUNC + $loginName + "$"
+        $this.homeShare = $serverUNC + "\\" +  $loginName + "$"
         $this.ouPath = $ouPath
         $this.UPN = $loginName + "@" + $script:localDomain
 
@@ -239,6 +241,7 @@ function registerUsers(){
             foreach ($group in $user.groups){
                 try {
                     if ($group -ne "Domain Admins"){
+                        Write-Host("Hit Group adding loop") -ForegroundColor Cyan
                         Add-ADGroupMember -Identity ("OU=" + $groupPrefix + "," + $group.DistinguishedName) -Members $user.loginName
                         Write-Host("User $($user.loginName) added to Group $($groupPrefix + $group).") -ForegroundColor Green
                     }
@@ -261,6 +264,8 @@ function registerUsers(){
             Write-Host("Error creating User $($user.loginName).") -ForegroundColor Red
         }
     }
+    Remove-Variable -Name startPW
+    Write-Host("All Users created successfully.") -ForegroundColor Green
 }
 
 function createNetworkShares(){
@@ -440,7 +445,7 @@ function configureDHCP(){
             Add-DhcpServerv4Scope -Name $dhcpConfig.Name -StartRange $dhcpConfig.ScopeStart -EndRange $dhcpConfig.ScopeEnd -SubnetMask $dhcpConfig.SubnetMask -LeaseDuration $dhcpConfig.LeaseDuration -State Active
             
             Set-DhcpServerV4OptionValue -ScopeId $dhcpConfig.ScopeID -DnsServer $dhcpConfig.DnsServer -Router $dhcpConfig.Gateway -DnsDomain $localDomain
-            
+
             Write-Host("DHCP Scope and Options configured successfully") -ForegroundColor Green
             Write-LogMessage("DHCP Scope and Options configured successfully", $null)
         }
@@ -448,43 +453,45 @@ function configureDHCP(){
             Write-LogMessage("Error creating DHCP scope", $_)
             Write-Host("Error creating DHCP scope") -ForegroundColor Red
         }
-
     }
     else {
-        if ($scope) {
-            Write-Host "Found DHCP scope: $($scope.Name) with ID $($scope.ScopeId)" -ForegroundColor Yellow
-            
-            # Prompt for confirmation
+        Write-Host "Found DHCP scope: $($existingDHCPScope.Name) with ID $($existingDHCPScope.ScopeId)" -ForegroundColor Yellow
+        # Prompt for confirmation
+        $confirmation = Read-Host "Are you sure you want to remove this scope? (y/n)"
+        # Loop until a valid input is received
+        while($confirmation.ToLower() -ne 'y' -and $confirmation.ToLower() -ne 'n'){
+            Write-Host "Invalid input. Please enter 'y' to remove or 'n' to skip DHCP configuration." -ForegroundColor Red
             $confirmation = Read-Host "Are you sure you want to remove this scope? (y/n)"
-            if ($confirmation -eq 'y') {
-                try {
-                    # Remove the scope
-                    Remove-DhcpServerv4Scope -ScopeId $scopeId -Force
-                    Write-Host "DHCP Scope has been removed successfully" -ForegroundColor Green
-                    Write-LogMessage "DHCP Scope has been removed successfully", $null
-                }
-                catch {
-                    Write-LogMessage("Error removing DHCP scope", $_)
-                    Write-Host "Error removing DHCP scope" -ForegroundColor Red
-                }
-                try {
-                    Add-DhcpServerv4Scope -Name $dhcpConfig.Name -StartRange $dhcpConfig.ScopeStart -EndRange $dhcpConfig.ScopeEnd -SubnetMask $dhcpConfig.SubnetMask -LeaseDuration $dhcpConfig.LeaseDuration -State Active
-            
-                    Set-DhcpServerV4OptionValue -ScopeId $dhcpConfig.ScopeID -DnsServer $dhcpConfig.DnsServer -Router $dhcpConfig.Gateway -DnsDomain $localDomain
+        }
 
-                    Write-Host("DHCP Scope and Options configured successfully") -ForegroundColor Green
-                    Write-LogMessage("DHCP Scope and Options configured successfully", $null)
-                }
-                catch {
-                    Write-LogMessage("Error creating DHCP scope", $_)
-                    Write-Host("Error creating DHCP scope") -ForegroundColor Red
-                }                
+        if ($confirmation -eq 'y') {
+            try {
+                # Remove the scope
+                Remove-DhcpServerv4Scope -ScopeId $scopeId -Force
+                Write-Host "DHCP Scope has been removed successfully" -ForegroundColor Green
+                Write-LogMessage "DHCP Scope has been removed successfully", $null
             }
-            else {
-                Write-Host "Scope removal cancelled" -ForegroundColor Cyan
-                Write-Host "Skipping DHCP scope creation" -ForegroundColor Yellow
-                return
+            catch {
+                Write-LogMessage("Error removing DHCP scope", $_)
+                Write-Host "Error removing DHCP scope" -ForegroundColor Red
             }
+            try {
+                Add-DhcpServerv4Scope -Name $dhcpConfig.Name -StartRange $dhcpConfig.ScopeStart -EndRange $dhcpConfig.ScopeEnd -SubnetMask $dhcpConfig.SubnetMask -LeaseDuration $dhcpConfig.LeaseDuration -State Active
+        
+                Set-DhcpServerV4OptionValue -ScopeId $dhcpConfig.ScopeID -DnsServer $dhcpConfig.DnsServer -Router $dhcpConfig.Gateway -DnsDomain $localDomain
+
+                Write-Host("DHCP Scope and Options configured successfully") -ForegroundColor Green
+                Write-LogMessage("DHCP Scope and Options configured successfully", $null)
+            }
+            catch {
+                Write-LogMessage("Error creating DHCP scope", $_)
+                Write-Host("Error creating DHCP scope") -ForegroundColor Red
+            }                
+        }
+        else {
+            Write-Host "Scope removal cancelled" -ForegroundColor Cyan
+            Write-Host "Skipping DHCP scope creation" -ForegroundColor Yellow
+            return
         }
     }
 }
