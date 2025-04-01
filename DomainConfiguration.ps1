@@ -195,7 +195,7 @@ function readConfigs($selConfig){
             $private:userOuPath = $ouConfig | Where-Object {$_.Name -eq ("MA-" + $ouChoice)}
             $userOuPath = "OU=" + $userOuPath.Name + "," + $userOuPath.DistinguishedName
         }
-        $allUsers.Add([User]::new($user.Name, $user.Surname, $user.loginName, $user.GroupsMemberships, $serverUNC, $private:userOuPath, $internetDomain))
+        $allUsers.Add([User]::new($user.Name, $user.Surname, $user.loginName, $user.GroupMemberships, $serverUNC, $private:userOuPath, $internetDomain))
     }
     foreach ($share in $shareConfig){
         $allShares.Add([networkShare]::new($share.Name, $share.Path, $share.ntfsPermissions, $share.SharePermissions))
