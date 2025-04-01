@@ -84,7 +84,7 @@ class User {
         $this.loginName = $loginName
         $this.mailAddress = $name + "." + $surname + "@" + $internetDomain
         $this.groups = $groups
-        $this.homeShare = $serverUNC + "\\" +  $loginName + "$"
+        $this.homeShare = $serverUNC + "\" +  $loginName + "$"
         $this.ouPath = $ouPath
         $this.UPN = $loginName + "@" + $script:localDomain
 
@@ -236,6 +236,20 @@ function registerUsers(){
     foreach ($user in $allUsers){
         Write-LogMessage("Creating User $($user.loginName)", $null)
         try {
+
+            # Create HomeShare on the Server
+            $private:homeSharePath = $user.loginName + "$"
+            $private:homeSharePath = $serverUNC + "\" + "Freigaben" + "\" + "UserShares" + $private:homeSharePath
+            
+            if (!(Test-Path $private:homeSharePath)){
+                New-Item -Path $private:homeSharePath -ItemType Directory
+                Write-Host("Home Share $($user.loginName) created successfully.") -ForegroundColor Green
+            }
+            else {
+                Write-Host("Home Share $($user.loginName) already exists.") -ForegroundColor Yellow
+            }
+            
+
             New-ADUser -GivenName $user.name -Surname $user.surname -Name ($user.surname + ", " + $user.name) -DisplayName ($user.surname + ", " + $user.name) -UserPrincipalName $user.UPN -SamAccountName $user.loginName -AccountPassword $startPW -Enabled $true -Path $user.ouPath -EmailAddress $user.mailAddress -HomeDrive "H:" -HomeDirectory $user.homeShare -ChangePasswordAtLogon $true
             Write-Host("User $($user.loginName) created successfully.") -ForegroundColor Green
             Write-Host("User Groups: $($user.groups)") -ForegroundColor Cyan
@@ -255,6 +269,20 @@ function registerUsers(){
                     Write-LogMessage("Error adding User $($user.loginName) to Group $($group)", $_)
                     Write-Host("Error adding User $($user.loginName) to Group $($group).") -ForegroundColor Red
                 }
+            }
+            # Set NTFS Permissions for the HomeShare
+            $private:homeShareACL = Get-Acl -Path $private:homeSharePath
+            $private:homeShareACL.SetAccessRuleProtection($true, $false) # Preserve existing permissions and disable inheritance
+            $private:homeShareACL.AddAccessRule((New-Object System.Security.AccessControl.FileSystemAccessRule($user.loginName,"FullControl","ContainerInherit, ObjectInherit","None","Allow")))
+            $private:homeShareACL | Set-Acl -Path $private:homeSharePath
+
+            # Set Share Permissions for the HomeShare
+            $private:homeShareShare = Get-SmbShare -Name $private:homeSharePath
+            $private:everyonePermExists = $private:homeShareShare | Get-SmbShareAccess | Where-Object { $_.AccountName -match "Jeder" } 
+
+            Grant-SmbShareAccess -Name $private:homeSharePath -AccountName $user.loginName -AccessRight Full -Force
+            if ($everyonePermExists){
+                Revoke-SmbShareAccess -Name $private:homeSharePath -AccountName "Jeder" -Force
             }
             # Add-ADGroupMember -Identity "Domänen-Benutzer" -Members $user.loginName
             # Write-Host("User $($user.loginName) added to Group Domain Users.") -ForegroundColor Green
@@ -333,10 +361,12 @@ function createNetworkShares(){
                 Default {Write-LogMessage("Error setting NTFS Permissions for $($share.name)", "Invalid NTFS Permission (Hit default case)")}
             }
             $private:fileSystemACLR = New-Object System.Security.AccessControl.FileSystemAccessRule -ArgumentList ($newACE.IdentityReference, $newACE.FileSystemRights, $newACE.InheritanceFlags, $newACE.PropogationFlags, $newACE.AccessControlType)
-            $acl.SetAccessRuleProtection($true, $true) # Preserve existing permissions and disable inheritance
+            $acl.SetAccessRuleProtection($true, $false) # Preserve existing permissions and disable inheritance
             $acl.AddAccessRule($fileSystemACLR)
         }
         $acl | Set-Acl
+        Get-NTFSAccess -Path $share.path | Format-Table -AutoSize
+
         New-SmbShare -Name $share.name -Path $share.path
 
         #Set Share Permissions
@@ -348,6 +378,13 @@ function createNetworkShares(){
                 "Read" { Grant-SmbShareAccess -Name $share.name -AccountName $groupName -AccessRight Read }
                 Default {Write-LogMessage("Error setting Share Permissions for $($share.name)", "Invalid Share Permission (Hit default case)")}
             }
+
+            # Remove Everyone Share Access if it exists
+            $private:everyonePermExists = Get-SmbShare -Name $share.name | Get-SmbShareAccess | Where-Object { $_.AccountName -match "Jeder" }
+            if ($everyonePermExists){
+                Revoke-SmbShareAccess -Name $share.name -AccountName "Jeder" -Force
+            }
+            Write-Host("Share Permissions for $($share.name) set successfully.") -ForegroundColor Green
         }
     }
 }
