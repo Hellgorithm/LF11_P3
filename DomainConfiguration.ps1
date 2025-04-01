@@ -421,7 +421,7 @@ function configureDHCP(){
 
     # Check if DHCP server is authorized in Active Directory
     $existingDHCPServer = Get-DhcpServerInDC | Where-Object { $_.DnsName -eq "$env:COMPUTERNAME.$localDomain" }
-    $existingDHCPScope = Get-DhcpServerv4Scope -ComputerName $env:COMPUTERNAME | Where-Object { $_.Name -eq $dhcpConfig.Name }
+    $existingDHCPScope = Get-DhcpServerv4Scope -ComputerName $env:COMPUTERNAME 
     if (!$existingDhcpServer) {
         Write-LogMessage("DHCP server not authorized, authorizing it now", $null)
         try {

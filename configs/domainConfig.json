@@ -63,6 +63,11 @@
     ],
     "Groups": [
         {
+            "Name": "Alle-MA",
+            "ouPath": "ou=Gruppen,dc=gr3,dc=laba304,dc=local",
+            "Permissions":{}
+        },
+        {
             "Name": "Auskunft",
             "ouPath": "ou=Gruppen,dc=gr3,dc=laba304,dc=local",
             "Permissions": {
