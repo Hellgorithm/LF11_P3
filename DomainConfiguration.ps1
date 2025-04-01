@@ -344,7 +344,7 @@ function createNetworkShares(){
             $private:groupName = $groupPrefix + $key
             switch ($share.sharePermissions[$key]) {
                 "FullAccess" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupName} -AccessRight Full }
-                "Change" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupName} -AccessRight Write }
+                "Change" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupName} -AccessRight Change }
                 "Read" { Grant-SmbShareAccess -Name $share.name -AccountName {$groupName} -AccessRight Read }
                 Default {Write-LogMessage("Error setting Share Permissions for $($share.name)", "Invalid Share Permission (Hit default case)")}
             }
