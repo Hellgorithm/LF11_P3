@@ -332,11 +332,11 @@ function createNetworkShares(){
                 }
                 Default {Write-LogMessage("Error setting NTFS Permissions for $($share.name)", "Invalid NTFS Permission (Hit default case)")}
             }
-            $private:fileSystemACLR = New-Object System.Security.AccessControl.FileSystemAccessRule -ArgumentList @newACE
+            $private:fileSystemACLR = New-Object System.Security.AccessControl.FileSystemAccessRule -ArgumentList ($newACE.IdentityReference, $newACE.FileSystemRights, $newACE.InheritanceFlags, $newACE.PropogationFlags, $newACE.AccessControlType)
             $acl.SetAccessRuleProtection($true, $true) # Preserve existing permissions and disable inheritance
             $acl.AddAccessRule($fileSystemACLR)
         }
-        Set-Acl -Path $share.path -AclObject $acl
+        $acl | Set-Acl
         New-SmbShare -Name $share.name -Path $share.path
 
         #Set Share Permissions
