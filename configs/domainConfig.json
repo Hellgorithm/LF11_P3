@@ -214,157 +214,301 @@
             "Name": "Vorlagen",
             "Path": "C:\\Freigaben\\Vorlagen",
             "Owner": "admsys",
-            "NTFSPermissions": {
-                "Auskunft": "ReadAndExecute",
-                "STB": "ReadAndExecute",
-                "Beratung": "ReadAndExecute",
-                "Technik": "Modify",
-                "GL": "Modify"
-            },
-            "SharePermissions": {
-                "Auskunft": "Read",
-                "STB": "Read",
-                "Beratung": "Read",
-                "Technik": "Change",
-                "GL": "Change"
-            }
+            "NTFSPermissions": [
+                {
+                "Name": "Auskunft",
+                "Permission": "ReadAndExecute"
+                },
+                {
+                "Name": "STB",
+                "Permission": "ReadAndExecute"
+                },
+                {
+                "Name": "Beratung",
+                "Permission": "ReadAndExecute"
+                },
+                {
+                "Name": "Technik",
+                "Permission": "Modify"
+                },
+                {
+                "Name": "GL",
+                "Permission": "Modify"
+                }
+            ],
+            "SharePermissions": [
+                {
+                    "Name": "Auskunft",
+                    "Permission": "Read"
+                },
+                {
+                    "Name": "STB",
+                    "Permission": "Read"
+                },
+                {
+                    "Name": "Beratung",
+                    "Permission": "Read"
+                },
+                {
+                    "Name": "Technik",
+                    "Permission": "Change"
+                },
+                {
+                    "Name": "GL",
+                    "Permission": "Change"
+                }
+            ]
         },
         {
             "Name": "Transfer",
             "Path": "C:\\Freigaben\\Transfer",
             "Owner": "admsys",
-            "NTFSPermissions": {
-                "Auskunft": "Modify",
-                "STB": "Modify",
-                "Beratung": "Modify",
-                "Technik": "Modify",
-                "GL": "Modify"
-            },
-            "SharePermissions": {
-                "Auskunft": "Change",
-                "STB": "Change",
-                "Beratung": "Change",
-                "Technik": "Change",
-                "GL": "Change"
-            }
+            "NTFSPermissions": [
+                {
+                    "Name": "Auskunft",
+                    "Permission": "Modify"
+                },
+                {
+                    "Name": "STB",
+                    "Permission": "Modify"
+                },
+                {
+                    "Name": "Beratung",
+                    "Permission": "Modify"
+                },
+                {
+                    "Name": "Technik",
+                    "Permission": "Modify"
+                },
+                {
+                    "Name": "GL",
+                    "Permission": "Modify"
+                }
+            ],
+            "SharePermissions": [
+                {
+                    "Name": "Auskunft",
+                    "Permission": "Change"
+                },
+                {
+                    "Name": "STB",
+                    "Permission": "Change"
+                },
+                {
+                    "Name": "Beratung",
+                    "Permission": "Change"
+                },
+                {
+                    "Name": "Technik",
+                    "Permission": "Change"
+                },
+                {
+                    "Name": "GL",
+                    "Permission": "Change"
+                }
+            ]
         },
         {
             "Name": "Transfer_Ausk",
             "Path": "C:\\Freigaben\\Transfer_Ausk",
             "Owner": "admsys",
-            "NTFSPermissions": {
-                "Auskunft": "Modify"
-            },
-            "SharePermissions": {
-                "Auskunft": "Change"
-            }
+            "NTFSPermissions": [
+                {
+                    "Name": "Auskunft",
+                    "Permission": "Modify"
+                }
+            ],
+            "SharePermissions": [
+                {
+                    "Name": "Auskunft",
+                    "Permission": "Change"
+                }
+            ]
         },
         {
             "Name": "Vorlagen_Ausk",
             "Path": "C:\\Freigaben\\Vorlagen_Ausk",
             "Owner": "admsys",
-            "NTFSPermissions": {
-                "Auskunft": "ReadAndExecute",
-                "GL": "Modify"
-            },
-            "SharePermissions": {
-                "Auskunft": "Read",
-                "GL": "Change"
-            }         
+            "NTFSPermissions": [
+                {
+                    "Name": "Auskunft",
+                    "Permission": "ReadAndExecute"
+                },
+                {
+                    "Name": "GL",
+                    "Permission": "Modify"
+                }
+            ],
+            "SharePermissions": [
+                {
+                    "Name": "Auskunft",
+                    "Permission": "Read"
+                },
+                {
+                    "Name": "GL",
+                    "Permission": "Change"
+                }
+            ]         
         },
         {
             "Name": "Transfer_STB",
             "Path": "C:\\Freigaben\\Transfer_STB",
             "Owner": "admsys",
-            "NTFSPermissions": {
-                "STB": "Modify"
-            },
-            "SharePermissions": {
-                "STB": "Change"
-            }
+            "NTFSPermissions": [
+                {
+                    "Name": "STB",
+                    "Permission": "Modify"
+                }
+            ],
+            "SharePermissions": [
+                {
+                    "Name": "STB",
+                    "Permission": "Change"
+                }
+            ]
         },
         {
             "Name": "Vorlagen_STB",
             "Path": "C:\\Freigaben\\Vorlagen_STB",
             "Owner": "admsys",
-            "NTFSPermissions": {
-                "STB": "ReadAndExecute",
-                "GL": "Modify"
-            },
-            "SharePermissions": {
-                "STB": "Read",
-                "GL": "Change"
-            }
+            "NTFSPermissions": [
+                {
+                    "Name": "STB",
+                    "Permission": "ReadAndExecute"
+                },
+                {
+                    "Name": "GL",
+                    "Permission": "Modify"
+                }
+            ],
+            "SharePermissions": [
+                {
+                    "Name": "STB",
+                    "Permission": "Read"
+                },
+                {
+                    "Name": "GL",
+                    "Permission": "Change"
+                }
+            ]
         },
         {
             "Name": "Transfer_Beratung",
             "Path": "C:\\Freigaben\\Transfer_Beratung",
             "Owner": "admsys",
-            "NTFSPermissions": {
-                "Beratung": "Modify"
-            },
-            "SharePermissions": {
-                "Beratung": "Change"
-            }
+            "NTFSPermissions": [
+                {
+                    "Name": "Beratung",
+                    "Permission": "Modify"
+                }
+            ],
+            "SharePermissions": [
+                {
+                    "Name": "Beratung",
+                    "Permission": "Change"
+                }
+            ]
         },
         {
             "Name": "Vorlagen_Beratung",
             "Path": "C:\\Freigaben\\Vorlagen_Beratung",
             "Owner": "admsys",
-            "NTFSPermissions": {
-                "Beratung": "ReadAndExecute",
-                "GL": "Modify"
-            },
-            "SharePermissions": {
-                "Beratung": "Read",
-                "GL": "Change"
-            }
+            "NTFSPermissions": [
+                {
+                    "Name": "Beratung",
+                    "Permission": "ReadAndExecute"
+                },
+                {
+                    "Name": "GL",
+                    "Permission": "Modify"
+                }
+            ],
+            "SharePermissions": [
+                {
+                    "Name": "Beratung",
+                    "Permission": "Read"
+                },
+                {
+                    "Name": "GL",
+                    "Permission": "Change"
+                }
+            ]
         },
         {
             "Name": "Transfer_Technik",
             "Path": "C:\\Freigaben\\Transfer_Technik",
             "Owner": "admsys",
-            "NTFSPermissions": {
-                "Technik": "Modify"
-            },
-            "SharePermissions": {
-                "Technik": "Change"
-            }
+            "NTFSPermissions": [
+                {
+                    "Name": "Technik",
+                    "Permission": "Modify"
+                }
+            ],
+            "SharePermissions": [
+                {
+                    "Name": "Technik",
+                    "Permission": "Change"
+                }
+            ]
         },
         {
             "Name": "Vorlagen_Technik",
             "Path": "C:\\Freigaben\\Vorlagen_Technik",
             "Owner": "admsys",
-            "NTFSPermissions": {
-                "Technik": "ReadAndExecute",
-                "GL": "Modify"
-            },
-            "SharePermissions": {
-                "Technik": "Read",
-                "GL": "Change"
-            }
+            "NTFSPermissions": [
+                {
+                    "Name": "Technik",
+                    "Permission": "ReadAndExecute"
+                },
+                {
+                    "Name": "GL",
+                    "Permission": "Modify"
+                }
+            ],
+            "SharePermissions": [
+                {
+                    "Name": "Technik",
+                    "Permission": "Read"
+                },
+                {
+                    "Name": "GL",
+                    "Permission": "Change"
+                }
+            ]
         },
         {
             "Name": "Transfer_GL",
             "Path": "C:\\Freigaben\\Transfer_GL",
             "Owner": "admsys",
-            "NTFSPermissions": {
-                "GL": "FullAccess"
-            },
-            "SharePermissions": {
-                "GL": "FullAccess"
-            }
+            "NTFSPermissions": [
+                {
+                    "Name": "GL",
+                    "Permission": "FullAccess"
+                }
+            ],
+            "SharePermissions": [
+                {
+                    "Name": "GL",   
+                    "Permission": "FullAccess"
+                }
+            ]
         },
         {
             "Name": "Vorlagen_GL",
             "Path": "C:\\Freigaben\\Vorlagen_GL",
             "Owner": "admsys",
-            "NTFSPermissions": {
-                "GL": "FullAccess"
-            },
-            "SharePermissions": {
-                "GL": "FullAccess"
-            }
+            "NTFSPermissions": [
+                {
+                    "Name": "GL",
+                    "Permission": "FullAccess"
+                }
+            ],
+            "SharePermissions": [
+                {
+                    "Name": "GL",
+                    "Permission": "FullAccess"
+                }
+            ]
         }
     ],
     "DHCP": [

@@ -116,11 +116,11 @@ class networkShare {
         $this.path = $path
         $this.ntfsPermissions = @{}
         $this.sharePermissions = @{}
-        foreach ($key in $ntfsPermissions.Keys){
-            $this.ntfsPermissions.Add($key, $ntfsPermissions.$key)
+        foreach ($perm in $ntfsPermissions){
+            $this.ntfsPermissions.Add($perm.Name, $perm.Permission)
         }
-        foreach ($key in $sharePermissions.Keys){
-            $this.sharePermissions.Add($key, $sharePermissions.$key)
+        foreach ($perm in $sharePermissions){
+            $this.sharePermissions.Add($perm.Name, $perm.Permission)
         }
     }
 }
@@ -505,7 +505,7 @@ function Main(){
     registerGroups
     registerUsers
     createNetworkShares
-    configureDHCP
+    # configureDHCP
 }
 
 #endregion Main
