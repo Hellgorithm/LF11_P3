@@ -243,7 +243,7 @@ function registerUsers(){
                 try {
                     if ($group -ne "Domain Admins"){
                         Write-Host("Hit Group adding loop") -ForegroundColor Cyan
-                        Add-ADGroupMember -Identity ("OU=" + $groupPrefix + "," + $group.DistinguishedName) -Members $user.loginName
+                        Add-ADGroupMember -Identity ($groupPrefix +  $group) -Members $user.loginName
                         Write-Host("User $($user.loginName) added to Group $($groupPrefix + $group).") -ForegroundColor Green
                     }
                     else {
