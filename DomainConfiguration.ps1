@@ -114,14 +114,14 @@ class networkShare {
     networkShare($name, $path, $ntfsPermissions, $sharePermissions){
         $this.name = $name
         $this.path = $path
-        $this.ntfsPermissions = $ntfsPermissions
-        $this.sharePermissions = $sharePermissions
-        # foreach ($key in $ntfsPermissions.Keys){
-        #     $this.ntfsPermissions.Add($key, $ntfsPermissions.$key)
-        # }
-        # foreach ($key in $sharePermissions.Keys){
-        #     $this.sharePermissions.Add($key, $sharePermissions.$key)
-        # }
+        $this.ntfsPermissions = @{}
+        $this.sharePermissions = @{}
+        foreach ($key in $ntfsPermissions.Keys){
+            $this.ntfsPermissions.Add($key, $ntfsPermissions.$key)
+        }
+        foreach ($key in $sharePermissions.Keys){
+            $this.sharePermissions.Add($key, $sharePermissions.$key)
+        }
     }
 }
 
