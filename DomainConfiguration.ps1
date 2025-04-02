@@ -239,7 +239,7 @@ function registerUsers(){
 
             # Create HomeShare on the Server
             $private:homeSharePath = $user.loginName + "$"
-            $private:homeSharePath = $serverUNC + "\" + "Freigaben" + "\" + "UserShares" + $private:homeSharePath
+            $private:homeSharePath = $serverUNC + "\" + "Freigaben" + "\" + "UserShares" + "\" + $private:homeSharePath
             
             if (!(Test-Path $private:homeSharePath)){
                 New-Item -Path $private:homeSharePath -ItemType Directory
@@ -365,7 +365,6 @@ function createNetworkShares(){
             $acl.AddAccessRule($fileSystemACLR)
         }
         $acl | Set-Acl
-        Get-NTFSAccess -Path $share.path | Format-Table -AutoSize
 
         New-SmbShare -Name $share.name -Path $share.path
 
