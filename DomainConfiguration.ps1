@@ -53,6 +53,7 @@
 [int]$maxLogSize = 2MB # Maximum Size of the Log File before it is pruned
 [string]$groupPrefix = "grp_" # Prefix for all Groups created by the script
 [string]$noPrintGroup = $groupPrefix + "Besucher" # Group that is denied print access to all printers. If null, no group is denied print access. DONT REMOVE THE PREFIX UNLESS NULL!
+[string]$logonScriptPath = $PSScriptRoot + "\Netzlaufwerke.bat" # Path to the Logon Script that is executed when a User logs on to the Domain. This script is copied to the User's HomeShare and executed at logon.
 [System.Collections.Generic.List[string]]$noneOuGroups = @(
     "Domain Admins",
     "Domänen-Admins",
@@ -249,7 +250,7 @@ function registerUsers(){
             }
             
 
-            New-ADUser -GivenName $user.name -Surname $user.surname -Name ($user.surname + ", " + $user.name) -DisplayName ($user.surname + ", " + $user.name) -UserPrincipalName $user.UPN -SamAccountName $user.loginName -AccountPassword $startPW -Enabled $true -Path $user.ouPath -EmailAddress $user.mailAddress -HomeDrive "H:" -HomeDirectory $user.homeShare -ChangePasswordAtLogon $true
+            New-ADUser -GivenName $user.name -Surname $user.surname -Name ($user.surname + ", " + $user.name) -DisplayName ($user.surname + ", " + $user.name) -UserPrincipalName $user.UPN -SamAccountName $user.loginName -AccountPassword $startPW -Enabled $true -Path $user.ouPath -EmailAddress $user.mailAddress -HomeDrive "H:" -HomeDirectory $user.homeShare -ChangePasswordAtLogon $true -ScriptPath ("\\Gr3-DC\Netzlaufwerke.bat")
             Write-Host("User $($user.loginName) created successfully.") -ForegroundColor Green
             Write-Host("User Groups: $($user.groups)") -ForegroundColor Cyan
             foreach ($group in $user.groups){
