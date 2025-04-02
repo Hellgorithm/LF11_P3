@@ -238,8 +238,7 @@ function registerUsers(){
         try {
 
             # Create HomeShare on the Server
-            $private:homeSharePath = $user.loginName + "$"
-            $private:homeSharePath =  "C:\Freigaben\UserShares\" + $private:homeSharePath
+            $private:homeSharePath =  "C:\Freigaben\UserShares\" + $user.loginName
             
             if (!(Test-Path $private:homeSharePath)){
                 New-Item -Path $private:homeSharePath -ItemType Directory
@@ -275,6 +274,9 @@ function registerUsers(){
             $private:homeShareACL.SetAccessRuleProtection($true, $false) # Preserve existing permissions and disable inheritance
             $private:homeShareACL.AddAccessRule((New-Object System.Security.AccessControl.FileSystemAccessRule($user.loginName,"FullControl","ContainerInherit, ObjectInherit","None","Allow")))
             $private:homeShareACL | Set-Acl -Path $private:homeSharePath
+
+            # Add Network share for HomeShare
+            New-SmbShare -Name ($user.loginName + "$") -Path $private:homeSharePath -FullAccess $user.loginName -Description "Home Share for User $($user.loginName)"
 
             # Set Share Permissions for the HomeShare
             $private:homeShareShare = Get-SmbShare -Name $private:homeSharePath
