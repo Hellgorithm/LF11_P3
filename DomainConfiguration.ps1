@@ -286,9 +286,9 @@ function registerUsers(){
             $private:homeShareShare = Get-SmbShare -Name ($user.loginName + "$")
             $private:everyonePermExists = $private:homeShareShare | Get-SmbShareAccess | Where-Object { $_.AccountName -match "Jeder" } 
 
-            Grant-SmbShareAccess -Name $private:homeSharePath -AccountName $user.loginName -AccessRight Full -Force
+            Grant-SmbShareAccess -Name ($user.loginName + "$") -AccountName $user.loginName -AccessRight Full -Force
             if ($everyonePermExists){
-                Revoke-SmbShareAccess -Name $private:homeSharePath -AccountName "Jeder" -Force
+                Revoke-SmbShareAccess -Name ($user.loginName + "$") -AccountName "Jeder" -Force
             }
             # Add-ADGroupMember -Identity "Domänen-Benutzer" -Members $user.loginName
             # Write-Host("User $($user.loginName) added to Group Domain Users.") -ForegroundColor Green
