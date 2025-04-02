@@ -239,7 +239,7 @@ function registerUsers(){
 
             # Create HomeShare on the Server
             $private:homeSharePath = $user.loginName + "$"
-            $private:homeSharePath = $serverUNC + "\" + "Freigaben" + "\" + "UserShares" + "\" + $private:homeSharePath
+            $private:homeSharePath =  "C:\Freigaben\UserShares\" + $private:homeSharePath
             
             if (!(Test-Path $private:homeSharePath)){
                 New-Item -Path $private:homeSharePath -ItemType Directory
