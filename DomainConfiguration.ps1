@@ -283,7 +283,7 @@ function registerUsers(){
 
 
             # Set Share Permissions for the HomeShare
-            $private:homeShareShare = Get-SmbShare -Name $private:homeSharePath
+            $private:homeShareShare = Get-SmbShare -Name ($user.loginName + "$")
             $private:everyonePermExists = $private:homeShareShare | Get-SmbShareAccess | Where-Object { $_.AccountName -match "Jeder" } 
 
             Grant-SmbShareAccess -Name $private:homeSharePath -AccountName $user.loginName -AccessRight Full -Force
