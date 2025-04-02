@@ -42,6 +42,8 @@
 #requires -Version 5.1
 #requires -Modules ActiveDirectory, PrintManagement
 
+Import-Module ActiveDirectory
+Import-Module FileServerResourceManager
 
 #region Global Variables
 [string]$configFolderPath = $PSScriptRoot + "\configs\" # Folder containing the Config Files for the Domain Configuration
@@ -277,6 +279,7 @@ function registerUsers(){
             New-SmbShare -Name ($user.loginName + "$") -Path $private:homeSharePath -FullAccess $user.loginName -Description "Home Share for User $($user.loginName)"
 
 
+
             $private:homeShareACL = Get-Acl -Path $private:homeSharePath
             $private:homeShareACL.SetAccessRuleProtection($true, $false) # Preserve existing permissions and disable inheritance
             $private:homeShareACL.AddAccessRule((New-Object System.Security.AccessControl.FileSystemAccessRule($user.loginName,"FullControl","ContainerInherit, ObjectInherit","None","Allow")))
@@ -293,6 +296,18 @@ function registerUsers(){
             }
             # Add-ADGroupMember -Identity "Domänen-Benutzer" -Members $user.loginName
             # Write-Host("User $($user.loginName) added to Group Domain Users.") -ForegroundColor Green
+
+            # Set User Quotas
+            $quota = Get-FsrmQuota -Path $private:homeSharePath -ErrorAction SilentlyContinue
+            if (!$quota) {
+                New-FsrmQuota -Path $private:homeSharePath -Size 1GB -Description "Quota for User $($user.loginName)" -ErrorAction SilentlyContinue
+                Write-LogMessage("Quota for User $($user.loginName) created successfully.", $null)
+                Write-Host("Quota for User $($user.loginName) created successfully.") -ForegroundColor Green
+            }
+            else {
+                Write-LogMessage("Quota for User $($user.loginName) already exists.", $null)
+                Write-Host("Quota for User $($user.loginName) already exists.") -ForegroundColor Yellow
+            }
         }
         catch {
             Write-LogMessage("Error creating User $($user.loginName)", $_)
