@@ -270,13 +270,17 @@ function registerUsers(){
                 }
             }
             # Set NTFS Permissions for the HomeShare
+
+
+            # Add Network share for HomeShare
+            New-SmbShare -Name ($user.loginName + "$") -Path $private:homeSharePath -FullAccess $user.loginName -Description "Home Share for User $($user.loginName)"
+
+
             $private:homeShareACL = Get-Acl -Path $private:homeSharePath
             $private:homeShareACL.SetAccessRuleProtection($true, $false) # Preserve existing permissions and disable inheritance
             $private:homeShareACL.AddAccessRule((New-Object System.Security.AccessControl.FileSystemAccessRule($user.loginName,"FullControl","ContainerInherit, ObjectInherit","None","Allow")))
             $private:homeShareACL | Set-Acl -Path $private:homeSharePath
 
-            # Add Network share for HomeShare
-            New-SmbShare -Name ($user.loginName + "$") -Path $private:homeSharePath -FullAccess $user.loginName -Description "Home Share for User $($user.loginName)"
 
             # Set Share Permissions for the HomeShare
             $private:homeShareShare = Get-SmbShare -Name $private:homeSharePath
@@ -326,11 +330,13 @@ function createNetworkShares(){
             Write-Host("Share Folder $($share.name) created successfully.") -ForegroundColor Green
         }
         catch {
-            Write-LogMessage("Error creating Share $($share.name)", $_)
-            Write-Host("Error creating Share $($share.name).") -ForegroundColor Red
+            Write-LogMessage("Error creating Share folder $($share.name)", $_)
+            Write-Host("Error creating Share folder $($share.name).") -ForegroundColor Red
 
         }
         
+        New-SmbShare -Name $share.name -Path $share.path
+
         #Set NTFS Permissions
         $acl = Get-Acl -Path $share.path
         foreach ($key in $share.ntfsPermissions.Keys){
@@ -368,7 +374,7 @@ function createNetworkShares(){
         }
         $acl | Set-Acl
 
-        New-SmbShare -Name $share.name -Path $share.path
+        
 
         #Set Share Permissions
         foreach ($key in $share.sharePermissions.Keys){
