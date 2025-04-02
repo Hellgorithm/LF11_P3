@@ -250,7 +250,7 @@ function registerUsers(){
             }
             
 
-            New-ADUser -GivenName $user.name -Surname $user.surname -Name ($user.surname + ", " + $user.name) -DisplayName ($user.surname + ", " + $user.name) -UserPrincipalName $user.UPN -SamAccountName $user.loginName -AccountPassword $startPW -Enabled $true -Path $user.ouPath -EmailAddress $user.mailAddress -HomeDrive "H:" -HomeDirectory $user.homeShare -ChangePasswordAtLogon $true -ScriptPath ("\\Gr3-DC\Netzlaufwerke.bat")
+            New-ADUser -GivenName $user.name -Surname $user.surname -Name ($user.surname + ", " + $user.name) -DisplayName ($user.surname + ", " + $user.name) -UserPrincipalName $user.UPN -SamAccountName $user.loginName -AccountPassword $startPW -Enabled $true -Path $user.ouPath -EmailAddress $user.mailAddress -HomeDrive "H:" -HomeDirectory $user.homeShare -ChangePasswordAtLogon $true -ScriptPath ("Netzlaufwerke.bat")
             Write-Host("User $($user.loginName) created successfully.") -ForegroundColor Green
             Write-Host("User Groups: $($user.groups)") -ForegroundColor Cyan
             foreach ($group in $user.groups){
