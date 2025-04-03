@@ -290,7 +290,7 @@ function registerUsers(){
             $private:homeShareShare = Get-SmbShare -Name ($user.loginName + "$")
             $private:everyonePermExists = $private:homeShareShare | Get-SmbShareAccess | Where-Object { $_.AccountName -match "Jeder" } 
 
-            Grant-SmbShareAccess -Name ($user.loginName + "$") -AccountName $user.loginName -AccessRight Full -Force -ScopeName $localDomain
+            Grant-SmbShareAccess -Name ($user.loginName + "$") -AccountName $user.loginName -AccessRight Full -Force 
             if ($everyonePermExists){
                 Revoke-SmbShareAccess -Name ($user.loginName + "$") -AccountName "Jeder" -Force
             }
@@ -396,9 +396,9 @@ function createNetworkShares(){
         foreach ($key in $share.sharePermissions.Keys){
             $private:groupName = $groupPrefix + $key
             switch ($share.sharePermissions[$key]) {
-                "FullAccess" { Grant-SmbShareAccess -Name $share.name -AccountName $groupName -AccessRight Full -ScopeName $localDomain -Force }
-                "Change" { Grant-SmbShareAccess -Name $share.name -AccountName $groupName -AccessRight Change -ScopeName $localDomain -Force }
-                "Read" { Grant-SmbShareAccess -Name $share.name -AccountName $groupName -AccessRight Read -ScopeName $localDomain -Force }
+                "FullAccess" { Grant-SmbShareAccess -Name $share.name -AccountName $groupName -AccessRight Full  -Force }
+                "Change" { Grant-SmbShareAccess -Name $share.name -AccountName $groupName -AccessRight Change  -Force }
+                "Read" { Grant-SmbShareAccess -Name $share.name -AccountName $groupName -AccessRight Read  -Force }
                 Default {Write-LogMessage("Error setting Share Permissions for $($share.name)", "Invalid Share Permission (Hit default case)")}
             }
 
