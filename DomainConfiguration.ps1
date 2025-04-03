@@ -49,13 +49,13 @@ Import-Module FileServerResourceManager
 [string]$configFolderPath = $PSScriptRoot + "\configs\" # Folder containing the Config Files for the Domain Configuration
 [string]$configFilePath = $configFolderPath + "domainConfig.json" # JSON File containing Users, Groups to assign to them, and other attributes for User creation.
 [string]$logFilePath = $PSScriptRoot + "DomainConfig.log" # Log File for the Domain Configuration Script
-[string]$localDomain = "laba304.local" # Domain Name of the Local Environment
+[string]$localDomain = "gr3.laba304.local" # Domain Name of the Local Environment
 [string]$internetDomain = "biz-rundstadt.de" # Internet Routable/Searchable Domain Name
 [string]$serverUNC = "\\$env:COMPUTERNAME" # UNC Path to the Server
 [int]$maxLogSize = 2MB # Maximum Size of the Log File before it is pruned
 [string]$groupPrefix = "grp_" # Prefix for all Groups created by the script
 [string]$noPrintGroup = $groupPrefix + "Besucher" # Group that is denied print access to all printers. If null, no group is denied print access. DONT REMOVE THE PREFIX UNLESS NULL!
-[string]$logonScriptPath = $PSScriptRoot + "\Netzlaufwerke.bat" # Path to the Logon Script that is executed when a User logs on to the Domain. This script is copied to the User's HomeShare and executed at logon.
+[string]$logonScriptPath = $PSScriptRoo + "\netlogon" + "\Netzlaufwerke.bat" # Path to the Logon Script that is executed when a User logs on to the Domain. This script is copied to the User's HomeShare and executed at logon.
 [System.Collections.Generic.List[string]]$noneOuGroups = @(
     "Domain Admins",
     "Domänen-Admins",
@@ -252,7 +252,7 @@ function registerUsers(){
             }
             
 
-            New-ADUser -GivenName $user.name -Surname $user.surname -Name ($user.surname + ", " + $user.name) -DisplayName ($user.surname + ", " + $user.name) -UserPrincipalName $user.UPN -SamAccountName $user.loginName -AccountPassword $startPW -Enabled $true -Path $user.ouPath -EmailAddress $user.mailAddress -HomeDrive "H:" -HomeDirectory $user.homeShare -ChangePasswordAtLogon $true -ScriptPath ("Netzlaufwerke.bat")
+            $private:ADUser = New-ADUser -GivenName $user.name -Surname $user.surname -Name ($user.surname + ", " + $user.name) -DisplayName ($user.surname + ", " + $user.name) -UserPrincipalName $user.UPN -SamAccountName $user.loginName -AccountPassword $startPW -Enabled $true -Path $user.ouPath -EmailAddress $user.mailAddress -HomeDrive "H:" -HomeDirectory $user.homeShare -ChangePasswordAtLogon $true
             Write-Host("User $($user.loginName) created successfully.") -ForegroundColor Green
             Write-Host("User Groups: $($user.groups)") -ForegroundColor Cyan
             foreach ($group in $user.groups){
@@ -290,7 +290,7 @@ function registerUsers(){
             $private:homeShareShare = Get-SmbShare -Name ($user.loginName + "$")
             $private:everyonePermExists = $private:homeShareShare | Get-SmbShareAccess | Where-Object { $_.AccountName -match "Jeder" } 
 
-            Grant-SmbShareAccess -Name ($user.loginName + "$") -AccountName $user.loginName -AccessRight Full -Force
+            Grant-SmbShareAccess -Name ($user.loginName + "$") -AccountName $user.loginName -AccessRight Full -Force -ScopeName $localDomain
             if ($everyonePermExists){
                 Revoke-SmbShareAccess -Name ($user.loginName + "$") -AccountName "Jeder" -Force
             }
@@ -396,9 +396,9 @@ function createNetworkShares(){
         foreach ($key in $share.sharePermissions.Keys){
             $private:groupName = $groupPrefix + $key
             switch ($share.sharePermissions[$key]) {
-                "FullAccess" { Grant-SmbShareAccess -Name $share.name -AccountName $groupName -AccessRight Full }
-                "Change" { Grant-SmbShareAccess -Name $share.name -AccountName $groupName -AccessRight Change }
-                "Read" { Grant-SmbShareAccess -Name $share.name -AccountName $groupName -AccessRight Read }
+                "FullAccess" { Grant-SmbShareAccess -Name $share.name -AccountName $groupName -AccessRight Full -ScopeName $localDomain -Force }
+                "Change" { Grant-SmbShareAccess -Name $share.name -AccountName $groupName -AccessRight Change -ScopeName $localDomain -Force }
+                "Read" { Grant-SmbShareAccess -Name $share.name -AccountName $groupName -AccessRight Read -ScopeName $localDomain -Force }
                 Default {Write-LogMessage("Error setting Share Permissions for $($share.name)", "Invalid Share Permission (Hit default case)")}
             }
 
